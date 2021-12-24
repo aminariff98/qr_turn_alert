@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:qr_turn_alert/Screens/Welcome/welcome_screen2.dart';
 import 'package:qr_turn_alert/constants.dart';
-import 'package:qr_turn_alert/nav.dart';
-import 'package:qr_turn_alert/navGuest.dart';
 import 'package:qr_turn_alert/signup.dart';
+import 'package:qr_turn_alert/views/auth/sign-up.dart';
 
 class RoundedButton2 extends StatelessWidget {
   final String text;
@@ -29,8 +27,7 @@ class RoundedButton2 extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
           color: color,
           onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => WelcomeScreen2()));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUp()));
           },
           child: Text(
             text,

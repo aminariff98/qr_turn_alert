@@ -4,12 +4,12 @@ import 'package:qr_turn_alert/Screens/Welcome/components/background.dart';
 import 'package:qr_turn_alert/Screens/Welcome/components/rounded_button1.dart';
 import 'package:qr_turn_alert/Screens/Welcome/components/rounded_button2.dart';
 import 'package:qr_turn_alert/Screens/Welcome/welcome_screen.dart';
-import 'package:qr_turn_alert/Screens/Welcome/welcome_screen2.dart';
 import 'package:qr_turn_alert/constants.dart';
 import 'package:qr_turn_alert/Screens/Welcome/components/rounded_button.dart';
-import 'package:qr_turn_alert/nav.dart';
-import 'package:qr_turn_alert/navGuest.dart';
 import 'package:qr_turn_alert/signup.dart';
+import 'package:qr_turn_alert/views/auth/sign-up.dart';
+import 'package:qr_turn_alert/views/customer/customer-bottom-nav-bar.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
 
 /*class Body extends StatelessWidget {
   @override
@@ -114,7 +114,7 @@ class Body extends StatelessWidget {
               press: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NavGuest()),
+                  MaterialPageRoute(builder: (context) => CustomerBottomNavBar()),
                 );
               },
             ),
@@ -123,7 +123,7 @@ class Body extends StatelessWidget {
               press: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Nav()),
+                  MaterialPageRoute(builder: (context) => DealerBottomNavBar()),
                 );
               },
             ),
@@ -134,7 +134,7 @@ class Body extends StatelessWidget {
               press: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => WelcomeScreen2()),
+                  MaterialPageRoute(builder: (context) => SignUp()),
                 );
               },
             ),

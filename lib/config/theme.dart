@@ -10,13 +10,15 @@ ThemeData theme() {
     // fontFamily: 'Calibri',
 
     elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-      primary: Color(0XFFEEF4FD),
-      textStyle: TextStyle(color: Colors.white),
-      padding: EdgeInsets.zero,
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-    )),
+      style: ElevatedButton.styleFrom(
+        primary: Colors.transparent,
+        onPrimary: Colors.transparent,
+        textStyle: TextStyle(color: Colors.white),
+        padding: EdgeInsets.zero,
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      ),
+    ),
     textTheme: TextTheme(
       //app-bar
       headline1: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),

@@ -6,10 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:qr_turn_alert/constants.dart';
 import 'package:qr_turn_alert/covid19screens.dart';
-import 'package:qr_turn_alert/nav.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-
 
 FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -62,9 +61,7 @@ class QueueDetails extends StatefulWidget {
 }
 
 class _QueueDetailsState extends State<QueueDetails> {
-
   FlutterLocalNotificationsPlugin localNotification = new FlutterLocalNotificationsPlugin();
-
 
   static const maxSeconds = 20;
   int seconds = maxSeconds;
@@ -79,19 +76,16 @@ class _QueueDetailsState extends State<QueueDetails> {
         setState(() => seconds--);
       } else {
         stopTimer(reset: false);
-
       }
 
       if (seconds == 0) {
-
         test = test + 1;
-        if ( test == 1 ) {
+        if (test == 1) {
           CreateAlertDialog1(context);
           QueueWaitingSelected = QueueWaitingSelected - 1;
           displayNotification('Queue');
         }
       }
-
     });
   }
 
@@ -122,66 +116,58 @@ class _QueueDetailsState extends State<QueueDetails> {
   }*/
 
   CreateAlertDialog(BuildContext context) {
-
     TextEditingController customController = TextEditingController();
 
-    return showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        title: Text('Are you sure?'),
-        content: Text('Do you want to leave the queue?'
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Leave'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Nav()),
-
-              );
-            }
-          ),
-          FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              }
-          ),
-        ],
-      );
-    } );
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Are you sure?'),
+            content: Text('Do you want to leave the queue?'),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text('Leave'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DealerBottomNavBar()),
+                    );
+                  }),
+              FlatButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  }),
+            ],
+          );
+        });
   }
 
   CreateAlertDialog1(BuildContext context) {
-
     TextEditingController customController = TextEditingController();
 
-    return showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        title: Text('Reminder'),
-        content: Text('It is currently your turn. Please proceed at counter $SelectedCounter'
-        ),
-        actions: <Widget>[
-          FlatButton(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => Nav()),
-
-                );
-              }
-          )
-        ],
-      );
-    } );
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Reminder'),
+            content: Text('It is currently your turn. Please proceed at counter $SelectedCounter'),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text('Ok'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DealerBottomNavBar()),
+                    );
+                  })
+            ],
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-
     final isCompleted = seconds == 0;
 
     return Scaffold(
@@ -191,18 +177,34 @@ class _QueueDetailsState extends State<QueueDetails> {
         centerTitle: true,
         backgroundColor: kPrimaryColor,
         automaticallyImplyLeading: false,
-
       ),
       body: ListView(
         scrollDirection: Axis.vertical,
-
         children: <Widget>[
-          SizedBox(height: 30,),
-          Text(QueueLocation, textAlign: TextAlign.center, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
-          SizedBox(height: 10,),
-          Text(SelectedCounter, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-          SizedBox(height: 10,),
-          Text("Your Ticket Number", textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            QueueLocation,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            SelectedCounter,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "Your Ticket Number",
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           Container(
               margin: const EdgeInsets.symmetric(
                 vertical: 10,
@@ -215,29 +217,28 @@ class _QueueDetailsState extends State<QueueDetails> {
                 color: kPrimaryColor,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(children: <Widget>[
-                      Text(QueuePositionSelected.toString(),
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 100,
-                              fontWeight: FontWeight.bold), textAlign: TextAlign.center)
-                    ],
-                    ),
-                  ]
-              )
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                Row(
+                  children: <Widget>[Text(QueuePositionSelected.toString(), style: const TextStyle(color: Colors.white, fontSize: 100, fontWeight: FontWeight.bold), textAlign: TextAlign.center)],
+                ),
+              ])),
+          SizedBox(
+            height: 30,
           ),
-
-          SizedBox(height: 30,),
-          Text("Number of People ahead in line: $QueueWaitingSelected", textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-
-
-          SizedBox(height: 30,),
-          Text("Estimated Waiting Time", textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+          Text(
+            "Number of People ahead in line: $QueueWaitingSelected",
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            "Estimated Waiting Time",
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           Text("$seconds", textAlign: TextAlign.center),
-          
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Material(
@@ -248,8 +249,10 @@ class _QueueDetailsState extends State<QueueDetails> {
                 child: FlatButton(
                     height: 50,
                     padding: EdgeInsets.all(15.0),
-                    child: Text("Leave Queue", style: const TextStyle(
-                      color: Colors.white,)),
+                    child: Text("Leave Queue",
+                        style: const TextStyle(
+                          color: Colors.white,
+                        )),
                     onPressed: () {
                       //_showNotification();
                       CreateAlertDialog(context);
@@ -264,31 +267,21 @@ class _QueueDetailsState extends State<QueueDetails> {
                     },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
-
-                    )
-                )
-            ),
+                    ))),
           ),
         ],
       ),
     );
   }
 
-  Future<void> displayNotification(String match) async{
-    notificationsPlugin.zonedSchedule(
-        0,
-        match,
-        'This is a notification to indicate that it is currrently your turn for the queue',
-        tz.TZDateTime.now(tz.local).add(Duration(seconds: 20)),
-        NotificationDetails(
-          android: AndroidNotificationDetails('channel id', 'channel name', 'channel description')
-        ),
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-        androidAllowWhileIdle: true);
+  Future<void> displayNotification(String match) async {
+    notificationsPlugin.zonedSchedule(0, match, 'This is a notification to indicate that it is currrently your turn for the queue', tz.TZDateTime.now(tz.local).add(Duration(seconds: 20)),
+        NotificationDetails(android: AndroidNotificationDetails('channel id', 'channel name', 'channel description')),
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, androidAllowWhileIdle: true);
   }
 }
 
-void initializeSetting() async{
+void initializeSetting() async {
   var initializeAndroid = AndroidInitializationSettings('vqueue');
   var initializeSetting = InitializationSettings(android: initializeAndroid);
   await notificationsPlugin.initialize(initializeSetting);

@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_turn_alert/Screens/Welcome/welcome_screen.dart';
-import 'package:qr_turn_alert/analysispage.dart';
-import 'package:qr_turn_alert/analysispage1.dart';
 import 'package:qr_turn_alert/constants.dart';
 import 'package:qr_turn_alert/generate.dart';
+import 'package:qr_turn_alert/main.dart';
+import 'package:qr_turn_alert/views/auth/login.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -14,35 +14,27 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   CreateAlertDialog(BuildContext context) {
-
-    TextEditingController customController = TextEditingController();
-
-    return showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        title: Text('Are you sure?'),
-        content: Text('Do you want to logout from your account?'
-        ),
-        actions: <Widget>[
-          FlatButton(
-              child: Text('Logout'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => WelcomeScreen()),
-
-                );
-              }
-          ),
-          FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              }
-          ),
-        ],
-      );
-    } );
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Are you sure?'),
+            content: Text('Do you want to logout from your account?'),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text('Logout'),
+                  onPressed: () {
+                    EasyLoading.show();
+                    MyApp().signOut(context);
+                  }),
+              FlatButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  }),
+            ],
+          );
+        });
   }
 
   Widget build(BuildContext context) {
@@ -62,153 +54,142 @@ class _SettingsPageState extends State<SettingsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 28, top: 7),
+              Container(
+                padding: EdgeInsets.only(left: userScreenPadding, right: userScreenPadding),
                 child: CircleAvatar(
                   radius: 35,
-                  backgroundImage: AssetImage('assets/images/Profile.jpg'),
+                  backgroundColor: Colors.white,
+                  backgroundImage: AssetImage('assets/icons/profile/profile.png'),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 40, top: 7),
+              Expanded(
+                flex: 2,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text("Muhammad Haris Fahmi", style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    Text(
+                      "Muhammad Haris Fahmi Mad hassan Abu",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 40.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Text('Business Account',
-                          style: TextStyle(
-                            color: Colors.white,
-
-                          ),)
-                        ],
+                    Text(
+                      '\nBusiness Account',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
                       ),
                     )
                   ],
-                )
-
+                ),
               ),
-            ]
+              SizedBox(
+                width: userScreenPadding,
+              )
+            ],
           ),
-
           Expanded(
+            child: Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(top: 15),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
               child: Container(
-                width: double.infinity,
-                margin: EdgeInsets.only(top: 15),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(34)
-                    )
-                ),
-                child: Container(
-                  margin: EdgeInsets.all(10),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.settings,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "Settings",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        height: 15,
-                        thickness: 2,
-                      ),
-                      buildAccountOptionRow(context, "Account"),
-                      buildAccountOptionRow(context, "General"),
-                      buildAccountOptionRow(context, "Language"),
-                      buildAccountOptionRow(context, "Privacy and security"),
-                      buildAccountOptionRow1(context, "Setup Queue"),
-                      SizedBox(
-                        height: 40,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.volume_up_outlined,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "Notifications",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        height: 15,
-                        thickness: 2,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      buildNotificationOptionRow("Enable Notification", true),
-
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Material(
-                            color: kPrimaryColor,
-                            elevation: 14,
-                            borderRadius: BorderRadius.circular(10),
-                            shadowColor: Color(0x802196F3),
-                            child: FlatButton(
-                                height: 50,
-                                padding: EdgeInsets.all(15.0),
-                                child: Text("                                  Logout                                                  ", style: const TextStyle(
-                                  color: Colors.white,)),
-                                onPressed: () {
-                                  /*Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) => WelcomeScreen()));*/
-                                  CreateAlertDialog(context);
-                                },
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-
-                                )
-                            )
+                margin: EdgeInsets.all(10),
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.settings,
+                          color: Colors.black,
                         ),
-                      ),
-
-                    ],
-                  ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          "Settings",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      height: 15,
+                      thickness: 2,
+                    ),
+                    buildAccountOptionRow(context, "Account"),
+                    buildAccountOptionRow(context, "General"),
+                    buildAccountOptionRow(context, "Language"),
+                    buildAccountOptionRow(context, "Privacy and security"),
+                    buildAccountOptionRow1(context, "Setup Queue"),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.volume_up_outlined,
+                          color: Colors.black,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          "Notifications",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      height: 15,
+                      thickness: 2,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    buildNotificationOptionRow("Enable Notification", true),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Material(
+                          color: kPrimaryColor,
+                          elevation: 14,
+                          borderRadius: BorderRadius.circular(10),
+                          shadowColor: Color(0x802196F3),
+                          child: FlatButton(
+                              height: 50,
+                              padding: EdgeInsets.all(15.0),
+                              child: Text("Logout",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  )),
+                              onPressed: () {
+                                /*Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) => WelcomeScreen()));*/
+                                CreateAlertDialog(context);
+                              },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ))),
+                    ),
+                  ],
                 ),
               ),
+            ),
           ),
-
-
-
         ],
       ),
     );
   }
 
-          /*Container(
+  /*Container(
             padding: EdgeInsets.only(left: 16, top: 25, right: 16),
             child: ListView(
               children: [
@@ -328,17 +309,13 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),*/
 
-
   Row buildNotificationOptionRow(String title, bool isActive) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600]),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Transform.scale(
             scale: 0.7,
@@ -405,10 +382,7 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         Text(
           title,
-          style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600]),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Transform.scale(
             scale: 0.7,
@@ -425,10 +399,8 @@ class _SettingsPageState extends State<SettingsPage> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => Generate()),
+          MaterialPageRoute(builder: (context) => Generate()),
           //QueueDetails()),
-
         );
         //_ModalBottomSheet(context);
       },
