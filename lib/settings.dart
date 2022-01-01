@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/constants.dart';
 import 'package:qr_turn_alert/generate.dart';
 import 'package:qr_turn_alert/main.dart';
-import 'package:qr_turn_alert/views/auth/login.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -68,7 +67,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      "Muhammad Haris Fahmi Mad hassan Abu",
+                      "$fullName",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
@@ -77,7 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                     Text(
-                      '\nBusiness Account',
+                      (accountType == 'dealer') ? 'Business Account' : 'Normal Account',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,

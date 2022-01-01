@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_turn_alert/covid19homescreen.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-homepage.dart';
 import 'package:qr_turn_alert/queuepage1.dart';
 import 'package:qr_turn_alert/settings.dart';
 
@@ -11,7 +11,7 @@ class DealerBottomNavBar extends StatefulWidget {
 class _DealerBottomNavBarState extends State<DealerBottomNavBar> {
   int _selectedIndex = 0;
   List<Widget> _widgetOptions = <Widget>[
-    HomeScreen1(),
+    DealerHomepage(),
     QueuePage1(),
     SettingsPage(),
   ];

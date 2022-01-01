@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/config/config.dart';
 import 'package:qr_turn_alert/controller/FirebaseUserController.dart';
@@ -5,7 +6,9 @@ import 'package:qr_turn_alert/main.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:qr_turn_alert/models/UserModel.dart';
 import 'package:qr_turn_alert/views/auth/sign-up.dart';
+import 'package:qr_turn_alert/views/customer/customer-bottom-nav-bar.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
 
 class Login extends StatefulWidget {
@@ -20,6 +23,7 @@ class _LoginState extends State<Login> {
   String email = '', password = '';
   String emailError = '', passwordError = '';
   bool _obscurePassword = true;
+  late final DocumentReference<UserModel> userModel;
 
   @override
   void initState() {
@@ -29,8 +33,20 @@ class _LoginState extends State<Login> {
       if (user == null) {
         print('User is currently signed out!');
       } else {
-        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
         print('User is signed in!');
+
+        userModel = FirebaseUserController().getUser(user.uid);
+        uid = user.uid;
+        userModel.get().then((value) {
+          accountType = value.get('accountType');
+          fullName = value.get('fullName');
+
+          if (accountType == 'dealer') {
+            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
+          } else if (accountType == 'customer') {
+            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CustomerBottomNavBar()), (Route<dynamic> route) => false);
+          }
+        });
       }
     });
   }
@@ -68,6 +84,7 @@ class _LoginState extends State<Login> {
                       child: TextFormField(
                         style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
                         cursorColor: Color(0xFF9b9b9b),
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
                           border: InputBorder.none,
@@ -231,12 +248,23 @@ class _LoginState extends State<Login> {
   }
 
   _signIn() async {
+    print(email + password);
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
       EasyLoading.dismiss();
-      print(userCredential.user!.uid);
-      FirebaseUserController().addUser(userCredential.user!.uid, 'Salman Nasi Kandar Apollo Negeri Sembilan', 'dealer');
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
+      uid = userCredential.user!.uid;
+
+      userModel = FirebaseUserController().getUser(uid);
+      userModel.get().then((value) {
+        accountType = value.get('accountType');
+        fullName = value.get('fullName');
+        contactNumber = value.get('msisdn');
+        if (accountType == 'dealer') {
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
+        } else if (accountType == 'customer') {
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CustomerBottomNavBar()), (Route<dynamic> route) => false);
+        }
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');

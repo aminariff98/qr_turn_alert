@@ -9,8 +9,8 @@ class CustomerBottomNavBar extends StatefulWidget {
 class _CustomerBottomNavBar extends State<CustomerBottomNavBar> {
   int _selectedIndex = 0;
   List<Widget> _widgetOptions = <Widget>[
-    HomeScreen2(),
-    HomeScreen2(),
+    CustomerHomepage(),
+    CustomerHomepage(),
   ];
 
   void _onItemTap(int index) {

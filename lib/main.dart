@@ -6,13 +6,13 @@ import 'package:qr_turn_alert/config/config.dart';
 import 'package:qr_turn_alert/constants.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/views/auth/login.dart';
-import 'package:qr_turn_alert/views/auth/sign-up.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:qr_turn_alert/views/customer/customer-bottom-nav-bar.dart';
-import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 late var userScreenWidth, userScreenHeight, userScreenPadding, userTextSize;
+late var fullName, accountType, uid, contactNumber;
 FirebaseFirestore firestore = FirebaseFirestore.instance;
+firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

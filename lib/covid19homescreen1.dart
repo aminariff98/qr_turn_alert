@@ -1,20 +1,19 @@
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_turn_alert/covid19customappbar.dart';
 import 'package:qr_turn_alert/constants.dart';
-import 'package:qr_turn_alert/covid19screens.dart';
+import 'package:qr_turn_alert/main.dart';
 import 'package:qr_turn_alert/prequeue.dart';
 import 'dart:math';
 
-import 'queuing_detail_page.dart';
-
-class HomeScreen2 extends StatefulWidget {
+class CustomerHomepage extends StatefulWidget {
   @override
-  _HomeScreen2State createState() => _HomeScreen2State();
+  _CustomerHomepageState createState() => _CustomerHomepageState();
 }
 
-class _HomeScreen2State extends State<HomeScreen2> {
+class _CustomerHomepageState extends State<CustomerHomepage> {
+  List notificationCategory = ['Restaurant', 'Bank / Service', 'Restaurant', 'Event', 'Takeaway / Delivery', 'Hospital / Clinic', 'Barber / Salon / Spa'];
+
   String qrResult = "Not yet Scanned";
   @override
   Widget build(BuildContext context) {
@@ -45,12 +44,6 @@ class _HomeScreen2State extends State<HomeScreen2> {
           )
         ],
       ),
-      /*body: CustomScrollView(
-        physics: ClampingScrollPhysics(),
-        slivers: <Widget>[
-          _buildHeader(screenHeight),
-        ]
-      ),*/
       body: ListView(
         scrollDirection: Axis.vertical,
         children: <Widget>[
@@ -144,6 +137,41 @@ class _HomeScreen2State extends State<HomeScreen2> {
             color: Colors.black,
             fontSize: 15,
           )),*/
+          Padding(
+            padding: EdgeInsets.fromLTRB(userScreenPadding, userScreenPadding / 2, userScreenPadding, userScreenPadding),
+            child: Wrap(
+              children: [
+                for (int index = 0; index < notificationCategory.length; index++)
+                  Padding(
+                    padding: EdgeInsets.all(userScreenPadding / 5),
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        width: userScreenWidth * 0.43,
+                        height: userScreenWidth * 0.43,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.purple[900],
+                        ),
+                        alignment: Alignment.topCenter,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.notifications, color: Colors.green),
+                            Text(
+                              notificationCategory[index],
+                              softWrap: true,
+                              maxLines: 2,
+                              style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Material(
