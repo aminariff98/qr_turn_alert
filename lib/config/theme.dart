@@ -5,8 +5,8 @@ ThemeData theme() {
   return ThemeData(
     brightness: Brightness.dark,
     canvasColor: Color(0xffF3F6FB),
-    primaryColor: Color(0xFF46006A),
-    accentColor: Color(0xFFAD1F61),
+    primaryColor: Color(0xFFAD1F61),
+    accentColor: Color(0xFF46006A),
     // fontFamily: 'Calibri',
 
     elevatedButtonTheme: ElevatedButtonThemeData(

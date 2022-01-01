@@ -603,7 +603,7 @@ class _RegisterBranchState extends State<RegisterBranch> {
 
     EasyLoading.show();
     // Create a Reference to the file
-    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('branch').child('/$uid.jpg');
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('branch').child('/$uid' + widget.additionalUid + '.jpg');
 
     _downloadLink(ref);
     final metadata = firebase_storage.SettableMetadata(contentType: 'image/jpeg', customMetadata: {'picked-file-path': file.path});

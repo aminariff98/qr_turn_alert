@@ -4,50 +4,32 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_turn_alert/controller/FirebaseBranchController.dart';
+import 'package:qr_turn_alert/controller/FirebasePromotionController.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-promotion.dart';
 import 'package:qr_turn_alert/views/widgets/app-nav-bar.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:qr_turn_alert/views/widgets/drop-down-list.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class CreatePromotion extends StatefulWidget {
-  final String additionalUid;
-  const CreatePromotion({Key? key, required this.additionalUid}) : super(key: key);
+  final String id;
+  final String additionalId;
+  const CreatePromotion({Key? key, required this.id, required this.additionalId}) : super(key: key);
 
   @override
   _CreatePromotionState createState() => _CreatePromotionState();
 }
 
 class _CreatePromotionState extends State<CreatePromotion> {
-  String _branchName = '', _branchMsisdn = '', _branchState = '', _branchLong = '', _branchLat = '', _branchCategory = '';
-  List _states = [
-    'Johor',
-    'Kedah',
-    'Kelantan',
-    'Melaka',
-    'Negeri Sembilan',
-    'Pahang',
-    'Perak',
-    'Perlis',
-    'Pulau Pinang',
-    'Sabah',
-    'Sarawak',
-    'Selangor',
-    'Terengganu',
-    'W.P. Kuala Lumpur',
-    'W.P. Labuan',
-    'W.P. Putrajaya'
-  ];
+  String _name = '', _description = '', _referralCode = '';
 
-  List _category = ['Restaurant', 'Bank / Service', 'Restaurant', 'Event', 'Takeaway / Delivery', 'Hospital / Clinic', 'Barber / Salon / Spa'];
   late String downloadURL = '';
   final picker = ImagePicker();
   final _picker = ImagePicker();
-  var _branchAttachment;
+  var _promotionAttachment;
   List<String> items = ["Camera", "Photo Library"];
   @override
   Widget build(BuildContext context) {
@@ -55,7 +37,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
         child: AppNavBarFlat(
-          title: 'Branch Information',
+          title: 'Promotion Information',
         ),
       ),
       body: SingleChildScrollView(
@@ -84,7 +66,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
                           ),
                           child: ClipRect(
                             child: Center(
-                              child: (_branchAttachment == null)
+                              child: (_promotionAttachment == null)
                                   ? Text(
                                       'No image selected.',
                                       style: Theme.of(context).textTheme.bodyText2!.apply(
@@ -97,7 +79,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
                                         initialScale: PhotoViewComputedScale.contained,
                                         minScale: PhotoViewComputedScale.contained,
                                         maxScale: PhotoViewComputedScale.contained,
-                                        imageProvider: FileImage(io.File(_branchAttachment.path)),
+                                        imageProvider: FileImage(io.File(_promotionAttachment.path)),
                                         backgroundDecoration: BoxDecoration(color: Colors.transparent),
                                       ),
                                     ),
@@ -142,9 +124,9 @@ class _CreatePromotionState extends State<CreatePromotion> {
                     maxLines: 1,
                     onChanged: (value) {
                       if (value.isEmpty) {
-                        _branchName = '';
+                        _name = '';
                       } else {
-                        _branchName = value;
+                        _name = value;
                       }
                     },
                   ),
@@ -157,116 +139,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
                     Container(
                       padding: EdgeInsets.all(10.0),
                       child: Text(
-                        'Contact Number',
-                        style: Theme.of(context).textTheme.bodyText1!.apply(
-                              fontSizeDelta: userTextSize,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  decoration: new BoxDecoration(border: Border.all(width: 0.0, color: Colors.transparent), color: Color(0xFFEAF2FA), borderRadius: new BorderRadius.circular(12.0)),
-                  child: TextField(
-                    style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ],
-                    decoration: InputDecoration(
-                      fillColor: Color(0xFFEAF2FA),
-                      filled: true,
-                      prefixIcon: Padding(
-                        padding: EdgeInsets.fromLTRB(20.0, 15.0, 0.0, 15.0),
-                        child: Text(
-                          '+60 ',
-                          style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 15.0, 15.0),
-                      border: InputBorder.none,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.transparent, width: 0.0),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.transparent, width: 0.0),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      hintStyle: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
-                    ),
-                    maxLines: 1,
-                    onChanged: (value) {
-                      if (value.isEmpty) {
-                        _branchMsisdn = '';
-                      } else {
-                        _branchMsisdn = value;
-                      }
-                    },
-                  ),
-                ),
-                SizedBox(
-                  height: userScreenPadding / 2,
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text(
-                        'Category',
-                        style: Theme.of(context).textTheme.bodyText1!.apply(
-                              fontSizeDelta: userTextSize,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-                Stack(
-                  alignment: Alignment.centerLeft,
-                  children: [
-                    Container(
-                      decoration: new BoxDecoration(border: Border.all(width: 0.0, color: Colors.transparent), color: Color(0xFFEAF2FA), borderRadius: new BorderRadius.circular(12.0)),
-                      child: TextFormField(
-                        readOnly: true,
-                        style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
-                        cursorColor: Color(0xFF9b9b9b),
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          hintText: '',
-                          hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        maxLines: 1,
-                        onTap: () {
-                          getCategoryDropDownValue(context);
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15.0),
-                      child: Text(
-                        '$_branchCategory',
-                        style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: userScreenPadding / 2,
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text(
-                        'Longitude',
+                        'Description',
                         style: Theme.of(context).textTheme.bodyText1!.apply(
                               fontSizeDelta: userTextSize,
                             ),
@@ -279,7 +152,8 @@ class _CreatePromotionState extends State<CreatePromotion> {
                   child: TextFormField(
                     style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
                     cursorColor: Color(0xFF9b9b9b),
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
                       border: InputBorder.none,
@@ -290,12 +164,11 @@ class _CreatePromotionState extends State<CreatePromotion> {
                       hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
                     ),
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-                    maxLines: 1,
                     onChanged: (value) {
                       if (value.isEmpty) {
-                        _branchLong = '';
+                        _description = '';
                       } else {
-                        _branchLong = value;
+                        _description = value;
                       }
                     },
                   ),
@@ -308,7 +181,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
                     Container(
                       padding: EdgeInsets.all(10.0),
                       child: Text(
-                        'Latitude',
+                        'Referral Code',
                         style: Theme.of(context).textTheme.bodyText1!.apply(
                               fontSizeDelta: userTextSize,
                             ),
@@ -321,76 +194,26 @@ class _CreatePromotionState extends State<CreatePromotion> {
                   child: TextFormField(
                     style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
                     cursorColor: Color(0xFF9b9b9b),
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       errorBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
-                      hintText: '',
+                      hintText: 'Optional',
                       hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
                     ),
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     maxLines: 1,
                     onChanged: (value) {
                       if (value.isEmpty) {
-                        _branchLat = '';
+                        _referralCode = '';
                       } else {
-                        _branchLat = value;
+                        _referralCode = value;
                       }
                     },
                   ),
-                ),
-                SizedBox(
-                  height: userScreenPadding / 2,
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text(
-                        'State',
-                        style: Theme.of(context).textTheme.bodyText1!.apply(
-                              fontSizeDelta: userTextSize,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-                Stack(
-                  alignment: Alignment.centerLeft,
-                  children: [
-                    Container(
-                      decoration: new BoxDecoration(border: Border.all(width: 0.0, color: Colors.transparent), color: Color(0xFFEAF2FA), borderRadius: new BorderRadius.circular(12.0)),
-                      child: TextFormField(
-                        readOnly: true,
-                        style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
-                        cursorColor: Color(0xFF9b9b9b),
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          hintText: '',
-                          hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        maxLines: 1,
-                        onTap: () {
-                          getStateDropDownValue(context);
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15.0),
-                      child: Text(
-                        '$_branchState',
-                        style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -399,52 +222,6 @@ class _CreatePromotionState extends State<CreatePromotion> {
       ),
       bottomNavigationBar: SafeArea(child: getSubmitButton()),
     );
-  }
-
-  getStateDropDownValue(BuildContext context) async {
-    var index = await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return new BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-          child: DropDownList(
-            title: 'State',
-            items: _states,
-            selectedValue: _branchState,
-          ),
-        );
-      },
-    );
-
-    if (index != null) {
-      setState(() {
-        _branchState = _states[index];
-      });
-    }
-  }
-
-  getCategoryDropDownValue(BuildContext context) async {
-    var index = await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return new BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-          child: DropDownList(
-            title: 'State',
-            items: _category,
-            selectedValue: _branchCategory,
-          ),
-        );
-      },
-    );
-
-    if (index != null) {
-      setState(() {
-        _branchCategory = _category[index];
-      });
-    }
   }
 
   void _showPicker(context, source) {
@@ -560,7 +337,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
                 height: 30,
               ),
               Text(
-                'Create Branch',
+                'Create Promotion',
                 style: Theme.of(context).textTheme.button!.apply(
                       fontSizeDelta: userTextSize,
                       color: Colors.white,
@@ -571,7 +348,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
           padding: EdgeInsets.symmetric(vertical: 8),
         ),
         onPressed: () {
-          if (_branchName == '' || _branchMsisdn == '' || _branchLong == '' || _branchLat == '' || _branchCategory == '' || _branchState == '') {
+          if (_name == '' || _description == '') {
             // await Clipboard.setData(ClipboardData(
             //   text: link,
             // ));
@@ -583,7 +360,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
               ),
             );
           } else {
-            uploadFile(_branchAttachment);
+            uploadFile(_promotionAttachment);
           }
         },
       ),
@@ -603,7 +380,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
 
     EasyLoading.show();
     // Create a Reference to the file
-    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('branch').child('/$uid.jpg');
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('promotion').child('/' + widget.id + widget.additionalId + '.jpg');
 
     _downloadLink(ref);
     final metadata = firebase_storage.SettableMetadata(contentType: 'image/jpeg', customMetadata: {'picked-file-path': file.path});
@@ -619,14 +396,14 @@ class _CreatePromotionState extends State<CreatePromotion> {
 
   Future<void> _downloadLink(firebase_storage.Reference ref) async {
     final link = await ref.getDownloadURL();
-
-    _registerBranch(link);
-  }
-
-  _registerBranch(_imageUrl) async {
     EasyLoading.dismiss();
-    FirebaseBranchController().addBranch(uid, widget.additionalUid, _branchName, '0' + _branchMsisdn, _branchLong, _branchLat, _branchState, _branchCategory, _imageUrl);
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
+    FirebasePromotionController().addPromo(uid, widget.id, widget.additionalId, _name, _description, _referralCode, link);
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DealerPromotion(id: widget.id)),
+    );
   }
 
   Future getImageFromCamera(source) async {
@@ -639,7 +416,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
     setState(() {
       if (image != null) {
         if (source == "branchAttachment") {
-          _branchAttachment = image;
+          _promotionAttachment = image;
         }
       }
     });
@@ -655,7 +432,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
     setState(() {
       if (image != null) {
         if (source == "branchAttachment") {
-          _branchAttachment = image;
+          _promotionAttachment = image;
         }
       }
     });
