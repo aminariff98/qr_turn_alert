@@ -4,6 +4,7 @@ import 'package:qr_turn_alert/scan.dart';
 import 'package:qr_turn_alert/settings.dart';
 import 'package:qr_turn_alert/views/customer/customer-homepage.dart';
 import 'package:pandabar/pandabar.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 
 class CustomerBottomNavBar extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class CustomerBottomNavBar extends StatefulWidget {
 }
 
 class _CustomerBottomNavBar extends State<CustomerBottomNavBar> {
-  String page = 'Blue';
+  String page = 'Home';
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +30,9 @@ class _CustomerBottomNavBar extends State<CustomerBottomNavBar> {
         },
       ),
       bottomNavigationBar: PandaBar(
+        buttonColor: Colors.white70,
         buttonSelectedColor: Color(0xFFAD1F61),
         fabColors: [
-          Color(0xFFAD1F61),
-          Color(0xFFAD1F61),
           Color(0xFFAD1F61),
           Color(0xFFAD1F61),
         ],
@@ -42,8 +42,8 @@ class _CustomerBottomNavBar extends State<CustomerBottomNavBar> {
           size: 26,
         ),
         buttonData: [
-          PandaBarButtonData(id: 'Profile', icon: Icons.book, title: 'Profile'),
           PandaBarButtonData(id: 'Home', icon: Icons.dashboard, title: 'Home'),
+          PandaBarButtonData(id: 'Profile', icon: Icons.book, title: 'Profile'),
         ],
         onChange: (id) {
           setState(() {

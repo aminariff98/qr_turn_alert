@@ -66,7 +66,7 @@ class _BranchCategoryState extends State<BranchCategory> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => CustomerBranchDetail(
-                            branch: branch,
+                            id: branch['branchUid'],
                           )));
             },
             child: Card(
