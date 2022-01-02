@@ -7,7 +7,6 @@ import 'package:qr_turn_alert/controller/FirebasePromotionController.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:qr_turn_alert/models/PromotionModel.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
-import 'package:qr_turn_alert/views/dealer/dealer-branch-detail.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-create-promotion.dart';
 import 'package:qr_turn_alert/views/widgets/app-nav-bar.dart';
 import 'package:qr_turn_alert/views/widgets/promotion-display.dart';
@@ -22,6 +21,7 @@ class DealerPromotion extends StatefulWidget {
 class _DealerPromotionState extends State<DealerPromotion> {
   var promotions = [];
   late int count = 0;
+  // ignore: top_level_function_literal_block
   var promotionRef = FirebaseFirestore.instance.collection('promotion').get().then((QuerySnapshot querySnapshot) {});
   @override
   void initState() {
@@ -32,7 +32,6 @@ class _DealerPromotionState extends State<DealerPromotion> {
       querySnapshot.docs.forEach((doc) {
         if (doc["branchId"] == widget.id) {
           count++;
-          print(count);
         }
       });
     });

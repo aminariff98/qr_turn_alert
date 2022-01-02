@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/controller/FirebaseBranchController.dart';
+import 'package:qr_turn_alert/generate.dart';
 import 'package:qr_turn_alert/homepage.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:qr_turn_alert/models/BranchModel.dart';
@@ -195,7 +196,7 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                                 onTap: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => Homepage()),
+                                    MaterialPageRoute(builder: (context) => BranchQrCode(id: id)),
                                   );
                                 },
                                 child: Column(
@@ -214,6 +215,52 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                                       padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
                                       child: Text(
                                         'Qr Code',
+                                        style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(userScreenPadding, 0, userScreenPadding, userScreenPadding / 2),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Card(
+                            elevation: 4.0,
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(15),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => BranchQrCode(id: id)),
+                                  );
+                                },
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
+                                      child: Image(
+                                        image: AssetImage('assets/icons/branch/qr-code.png'),
+                                        fit: BoxFit.contain,
+                                      ),
+                                      height: (userScreenWidth * 0.25),
+                                      width: (userScreenWidth * 0.25),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
+                                      child: Text(
+                                        'Manage',
                                         style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
                                       ),
                                     ),

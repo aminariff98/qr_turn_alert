@@ -15,6 +15,7 @@ class FirebasePromotionController {
           'name': name,
           'description': description,
           'referralCode': referralCode,
+          'status': 'active',
           'imageUrl': imageUrl,
         })
         .then((value) => print("Promo Added"))
@@ -31,6 +32,16 @@ class FirebasePromotionController {
   }
 
   Future<void> deletePromo(id) {
+    return promo
+        .doc(id)
+        .update({
+          'status': 'close',
+        })
+        .then((value) => print("Promo Updated"))
+        .catchError((error) => print("Failed to update promo: $error"));
+  }
+
+  Future<void> permanenetDeletePromo(id) {
     return promo.doc(id).delete().then((value) => print("Promo Deleted")).catchError((error) => print("Failed to delete promo: $error"));
   }
 }

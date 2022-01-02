@@ -9,6 +9,7 @@ class PromotionModel {
     required this.name,
     required this.description,
     required this.referralCode,
+    required this.status,
     required this.imageUrl,
   });
 
@@ -20,6 +21,7 @@ class PromotionModel {
           name: json['name']! as String,
           description: json['description']! as String,
           referralCode: json['referralCode']! as String,
+          status: json['status']! as String,
           imageUrl: json['imageUrl']! as String,
         );
 
@@ -29,6 +31,7 @@ class PromotionModel {
   final String name;
   final String description;
   final String referralCode;
+  final String status;
   final String imageUrl;
 
   Map<String, Object?> toJson() {
@@ -39,6 +42,7 @@ class PromotionModel {
       'name': name,
       'description': description,
       'referralCode': referralCode,
+      'status': status,
       'imageUrl': imageUrl,
     };
   }

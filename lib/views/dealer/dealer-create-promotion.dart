@@ -8,7 +8,6 @@ import 'package:qr_turn_alert/controller/FirebasePromotionController.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-promotion.dart';
 import 'package:qr_turn_alert/views/widgets/app-nav-bar.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;

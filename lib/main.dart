@@ -11,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 late var userScreenWidth, userScreenHeight, userScreenPadding, userTextSize;
 late var fullName, accountType, uid, contactNumber;
+bool notification = true;
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
 

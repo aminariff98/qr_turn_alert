@@ -1,9 +1,14 @@
+import 'dart:ui';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/constants.dart';
-import 'package:qr_turn_alert/generate.dart';
+import 'package:qr_turn_alert/controller/FirebaseUserController.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:qr_turn_alert/models/UserModel.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-account-detail.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -11,418 +16,389 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  late String _name, _accountType;
+  late final DocumentReference<UserModel> userModel;
+
   @override
-  CreateAlertDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Are you sure?'),
-            content: Text('Do you want to logout from your account?'),
-            actions: <Widget>[
-              FlatButton(
-                  child: Text('Logout'),
-                  onPressed: () {
-                    EasyLoading.show();
-                    MyApp().signOut(context);
-                  }),
-              FlatButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  }),
-            ],
-          );
-        });
+  void initState() {
+    super.initState();
+    EasyLoading.dismiss();
+    userModel = FirebaseUserController().getUser(uid);
   }
 
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kPrimaryColor,
-      appBar: AppBar(
-        title: Text('Profile'),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        backgroundColor: kPrimaryColor,
-        elevation: 0,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Row(
+    return StreamBuilder<DocumentSnapshot<UserModel>>(
+      stream: userModel.snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(snapshot.error.toString()),
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final data = snapshot.requireData;
+        _name = data.get('fullName');
+        _accountType = data.get('accountType');
+
+        return Scaffold(
+          backgroundColor: kPrimaryColor,
+          appBar: AppBar(
+            title: Text('Profile'),
+            centerTitle: true,
+            automaticallyImplyLeading: false,
+            backgroundColor: kPrimaryColor,
+            elevation: 0,
+          ),
+          body: Column(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: userScreenPadding, right: userScreenPadding),
-                child: CircleAvatar(
-                  radius: 35,
-                  backgroundColor: Colors.white,
-                  backgroundImage: AssetImage('assets/icons/profile/profile.png'),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: userScreenPadding, right: userScreenPadding),
+                    child: CircleAvatar(
+                      radius: 35,
+                      backgroundColor: Colors.white,
+                      backgroundImage: AssetImage('assets/icons/profile/profile.png'),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          "$_name",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          (_accountType == 'dealer') ? 'Business Account' : 'Normal Account',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: userScreenPadding,
+                  )
+                ],
               ),
               Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "$fullName",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                child: Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(top: 15),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
+                  child: Container(
+                    margin: EdgeInsets.all(10),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 20,
+                        ),
+                        if (_accountType == 'customer') ...[
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.volume_up_outlined,
+                                color: Colors.black,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                "Notifications",
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          Divider(
+                            height: 15,
+                            thickness: 2,
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                            title: Text('Notification'),
+                            trailing: CupertinoSwitch(
+                              value: notification,
+                              onChanged: (bool value) {
+                                setState(() {
+                                  notification = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                        SizedBox(
+                          height: 40,
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.settings,
+                              color: Colors.black,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              "Settings",
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          height: 15,
+                          thickness: 2,
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                          title: Text('Account'),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            size: 24,
+                            color: Colors.grey,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              new MaterialPageRoute(builder: (context) => DealerAccountDetail()),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                          title: Text('Language'),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            size: 24,
+                            color: Colors.grey,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              new MaterialPageRoute(builder: (context) => DealerAccountDetail()),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                          title: Text('About App'),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            size: 24,
+                            color: Colors.grey,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              new MaterialPageRoute(builder: (context) => DealerAccountDetail()),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                          title: Text('Logout'),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            size: 24,
+                            color: Colors.grey,
+                          ),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (BuildContext context) {
+                                return new BackdropFilter(filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), child: logout(context));
+                              },
+                            );
+                          },
+                        ),
+                        // Spacer(),
+                        // Container(
+                        //   constraints: BoxConstraints(maxWidth: userScreenWidth * 0.4),
+                        //   child: ElevatedButton(
+                        //       style: ElevatedButton.styleFrom(
+                        //         primary: Colors.transparent,
+                        //         onPrimary: Colors.transparent,
+                        //         textStyle: TextStyle(color: Colors.white),
+                        //         padding: EdgeInsets.zero,
+                        //         elevation: 3,
+                        //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                        //       ),
+                        //       child: Container(
+                        //         decoration: BoxDecoration(
+                        //           borderRadius: BorderRadius.circular(50.0),
+                        //           gradient: LinearGradient(
+                        //             colors: <Color>[
+                        //               Color.fromRGBO(173, 31, 97, 1),
+                        //               Color.fromRGBO(70, 0, 106, 1),
+                        //             ],
+                        //           ),
+                        //         ),
+                        //         child: Text(
+                        //           'Logout',
+                        //           style: Theme.of(context).textTheme.button!.apply(
+                        //                 color: Colors.white,
+                        //                 fontSizeDelta: userTextSize,
+                        //               ),
+                        //         ),
+                        //         padding: EdgeInsets.symmetric(vertical: userScreenPadding / 1.5, horizontal: userScreenPadding * 2),
+                        //       ),
+                        //       onPressed: () {
+                        //         showDialog(
+                        //           context: context,
+                        //           barrierDismissible: true,
+                        //           builder: (BuildContext context) {
+                        //             return new BackdropFilter(filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), child: logout(context));
+                        //           },
+                        //         );
+                        //       }),
+                        // ),
+                        SizedBox(
+                          height: userScreenPadding,
+                        ),
+                      ],
                     ),
-                    Text(
-                      (accountType == 'dealer') ? 'Business Account' : 'Normal Account',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    )
-                  ],
+                  ),
                 ),
               ),
-              SizedBox(
-                width: userScreenPadding,
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget logout(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Card(
+          color: Color(0xffF3F6FB),
+          margin: EdgeInsets.fromLTRB(userScreenPadding * 2, userScreenPadding / 2, userScreenPadding * 2, userScreenPadding),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                enabled: false,
+                contentPadding: const EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 16.0),
+                title: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: userScreenPadding,
+                            ),
+                            Text(
+                              'Are you sure?',
+                              style: Theme.of(context).textTheme.bodyText1!.apply(
+                                    fontSizeDelta: 4,
+                                  ),
+                            ),
+                            SizedBox(
+                              height: userScreenPadding,
+                            ),
+                            Text(
+                              'Do you want to logout from this account?',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyText2!.apply(fontSizeDelta: 0),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                  ],
+                ),
+                onTap: () {},
+              ),
+              Divider(
+                color: Color(0xFF9D9E9E),
+                indent: 0,
+                endIndent: 0,
+                height: 1,
+                thickness: 0.5,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            width: 0.5,
+                            color: Color(0xFF9D9E9E),
+                          ),
+                        ),
+                      ),
+                      child: ListTile(
+                        minVerticalPadding: 14,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(bottomLeft: const Radius.circular(20.0)),
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        title: Center(
+                            child: Text(
+                          'Cancel',
+                          style: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: 0),
+                        )),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListTile(
+                      minVerticalPadding: 14,
+                      onTap: () {
+                        EasyLoading.show();
+                        MyApp().signOut(context);
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(bottomRight: const Radius.circular(20.0)),
+                      ),
+                      title: Center(
+                        child: Text(
+                          'Logout',
+                          style: Theme.of(context).textTheme.bodyText1!.apply(fontSizeDelta: (0)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               )
             ],
           ),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(top: 15),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
-              child: Container(
-                margin: EdgeInsets.all(10),
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.settings,
-                          color: Colors.black,
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          "Settings",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    Divider(
-                      height: 15,
-                      thickness: 2,
-                    ),
-                    buildAccountOptionRow(context, "Account"),
-                    buildAccountOptionRow(context, "General"),
-                    buildAccountOptionRow(context, "Language"),
-                    buildAccountOptionRow(context, "Privacy and security"),
-                    buildAccountOptionRow1(context, "Setup Queue"),
-                    SizedBox(
-                      height: 40,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.volume_up_outlined,
-                          color: Colors.black,
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          "Notifications",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    Divider(
-                      height: 15,
-                      thickness: 2,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    buildNotificationOptionRow("Enable Notification", true),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Material(
-                          color: kPrimaryColor,
-                          elevation: 14,
-                          borderRadius: BorderRadius.circular(10),
-                          shadowColor: Color(0x802196F3),
-                          child: FlatButton(
-                              height: 50,
-                              padding: EdgeInsets.all(15.0),
-                              child: Text("Logout",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                  )),
-                              onPressed: () {
-                                /*Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) => WelcomeScreen()));*/
-                                CreateAlertDialog(context);
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ))),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /*Container(
-            padding: EdgeInsets.only(left: 16, top: 25, right: 16),
-            child: ListView(
-              children: [
-                Text(
-                  "Settings",
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person,
-                      color: Colors.green,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      "Account",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 15,
-                  thickness: 2,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-          ]
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(0.0),
-                      child: Material(
-                          color: kPrimaryColor,
-                          elevation: 14,
-                          borderRadius: BorderRadius.circular(10),
-                          shadowColor: Color(0x802196F3),
-                          child: FlatButton(
-                              height: 50,
-                              padding: EdgeInsets.all(0.0),
-                              child: Text("                                         View Analytics                                   ", style: const TextStyle(
-                                color: Colors.white,)),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AnalysisPage1()),
-
-                                );
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-
-                              )
-                          )
-                      ),
-                    ),
-                  ],
-                ),
-                buildAccountOptionRow(context, "View Analytics"),
-                buildAccountOptionRow(context, "Social"),
-                buildAccountOptionRow(context, "Language"),
-                buildAccountOptionRow(context, "Privacy and security"),
-                SizedBox(
-                  height: 40,
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.volume_up_outlined,
-                      color: Colors.green,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      "Notifications",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 15,
-                  thickness: 2,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                buildNotificationOptionRow("New for you", true),
-                buildNotificationOptionRow("Account activity", true),
-                buildNotificationOptionRow("Opportunity", false),
-                SizedBox(
-                  height: 50,
-                ),
-                Center(
-                  child: OutlineButton(
-                    padding: EdgeInsets.symmetric(horizontal: 40),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    onPressed: () {},
-                    child: Text("SIGN OUT",
-                        style: TextStyle(
-                            fontSize: 16, letterSpacing: 2.2, color: Colors.black)),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),*/
-
-  Row buildNotificationOptionRow(String title, bool isActive) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
-        Transform.scale(
-            scale: 0.7,
-            child: CupertinoSwitch(
-              value: isActive,
-              onChanged: (bool val) {},
-            ))
       ],
-    );
-  }
-
-  GestureDetector buildAccountOptionRow(BuildContext context, String title) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(title),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text("Option 1"),
-                    Text("Option 2"),
-                    Text("Option 3"),
-                  ],
-                ),
-                actions: [
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("Close")),
-                ],
-              );
-            });
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Row buildNotificationOptionRow1(String title, bool isActive) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey[600]),
-        ),
-        Transform.scale(
-            scale: 0.7,
-            child: CupertinoSwitch(
-              value: isActive,
-              onChanged: (bool val) {},
-            ))
-      ],
-    );
-  }
-
-  GestureDetector buildAccountOptionRow1(BuildContext context, String title) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Generate()),
-          //QueueDetails()),
-        );
-        //_ModalBottomSheet(context);
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

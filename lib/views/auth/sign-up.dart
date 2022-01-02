@@ -342,35 +342,29 @@ class _SignUpState extends State<SignUp> {
                       padding: EdgeInsets.symmetric(vertical: userScreenPadding / 1.5, horizontal: userScreenPadding * 2),
                     ),
                     onPressed: () {
-                      if (msisdn.length > 8 && msisdn.length < 10) {
-                        if (email != '') {
-                          if (password != '') {
-                            if (password == confirmPassword) {
-                              EasyLoading.show();
-                              _register();
-                            } else {
-                              setState(() {
-                                passwordError = 'Password did not match';
-                                confirmPasswordError = 'Password did not match';
-                              });
-                            }
+                      if (email != '') {
+                        if (password != '') {
+                          if (password == confirmPassword) {
+                            EasyLoading.show();
+                            _register();
                           } else {
                             setState(() {
-                              passwordError = 'Password is empty';
+                              passwordError = 'Password did not match';
+                              confirmPasswordError = 'Password did not match';
                             });
                           }
                         } else {
-                          if (password == '') {
-                            passwordError = 'Password is empty';
-                            confirmPasswordError = 'Password is empty';
-                          }
                           setState(() {
-                            emailError = 'Email is empty';
+                            passwordError = 'Password is empty';
                           });
                         }
                       } else {
+                        if (password == '') {
+                          passwordError = 'Password is empty';
+                          confirmPasswordError = 'Password is empty';
+                        }
                         setState(() {
-                          msisdnError = 'Contact Number is invalid';
+                          emailError = 'Email is empty';
                         });
                       }
                     }),

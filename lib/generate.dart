@@ -1,63 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:qr_turn_alert/views/widgets/app-nav-bar.dart';
 
-class Generate extends StatefulWidget {
+class BranchQrCode extends StatefulWidget {
+  final String id;
+
+  const BranchQrCode({Key? key, required this.id}) : super(key: key);
+
   @override
-  _GenerateState createState() => _GenerateState();
+  _BranchQrCodeState createState() => _BranchQrCodeState();
 }
 
-class _GenerateState extends State<Generate> {
+class _BranchQrCodeState extends State<BranchQrCode> {
+  @override
+  void initState() {
+    super.initState();
+    EasyLoading.dismiss();
+  }
 
-  String qrData = "https://github.com";
   @override
   Widget build(BuildContext context) {
+    String qrData = widget.id;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Generate"),
-        centerTitle: true,
-      ),
-      body: Container(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            QrImage(data: qrData),
-
-            SizedBox(height: 10.0,),
-            Text("Get your data/link to the QR Code"),
-            TextField(
-              controller: qrText,
-              decoration: InputDecoration(
-                hintText: "Enter the data/link here",
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: AppNavBarFlat(
+            title: 'Qr Code',
+          ),
+        ),
+        body: Container(
+            padding: EdgeInsets.all(20.0),
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+              QrImage(
+                data: qrData,
+                version: QrVersions.auto,
+                gapless: false,
               ),
-            ),
-
-            SizedBox(height: 20.0),
-
-            FlatButton(
-                padding: EdgeInsets.all(15.0),
-                child: Text("Generate QR Code"),
-                onPressed: () {
-                  if(qrText.text.isEmpty) {
-                    setState(() {
-                      qrData = "https://flutter.dev";
-                    });
-                  }else{
-                    setState(() {
-                      qrData = qrText.text;
-                    });
-                  }
-                },
-              shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-              side: BorderSide(color: Colors.blue,width: 3.0)
-              )
-            )
-          ]
-        )
-      )
-    );
+            ])));
   }
-  final qrText = TextEditingController();
 }

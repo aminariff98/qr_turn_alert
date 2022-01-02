@@ -23,7 +23,7 @@ class RegisterBranch extends StatefulWidget {
 }
 
 class _RegisterBranchState extends State<RegisterBranch> {
-  String _branchName = '', _branchMsisdn = '', _branchState = '', _branchLong = '', _branchLat = '', _branchCategory = '';
+  String _branchName = '', _branchMsisdn = '', _branchCity = '', _branchState = '', _branchLong = '', _branchLat = '', _branchCategory = '';
   List _states = [
     'Johor',
     'Kedah',
@@ -342,6 +342,45 @@ class _RegisterBranchState extends State<RegisterBranch> {
                     },
                   ),
                 ),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text(
+                        'City',
+                        style: Theme.of(context).textTheme.bodyText1!.apply(
+                              fontSizeDelta: userTextSize,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  decoration: new BoxDecoration(border: Border.all(width: 0.0, color: Colors.transparent), color: Color(0xFFEAF2FA), borderRadius: new BorderRadius.circular(12.0)),
+                  child: TextFormField(
+                    style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
+                    cursorColor: Color(0xFF9b9b9b),
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      hintText: '',
+                      hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
+                    ),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    maxLines: 1,
+                    onChanged: (value) {
+                      if (value.isEmpty) {
+                        _branchCity = '';
+                      } else {
+                        _branchCity = value;
+                      }
+                    },
+                  ),
+                ),
                 SizedBox(
                   height: userScreenPadding / 2,
                 ),
@@ -571,7 +610,7 @@ class _RegisterBranchState extends State<RegisterBranch> {
           padding: EdgeInsets.symmetric(vertical: 8),
         ),
         onPressed: () {
-          if (_branchName == '' || _branchMsisdn == '' || _branchLong == '' || _branchLat == '' || _branchCategory == '' || _branchState == '') {
+          if (_branchName == '' || _branchMsisdn == '' || _branchCity == '' || _branchLong == '' || _branchLat == '' || _branchCategory == '' || _branchState == '') {
             // await Clipboard.setData(ClipboardData(
             //   text: link,
             // ));
@@ -625,7 +664,7 @@ class _RegisterBranchState extends State<RegisterBranch> {
 
   _registerBranch(_imageUrl) async {
     EasyLoading.dismiss();
-    FirebaseBranchController().addBranch(uid, widget.additionalUid, _branchName, '0' + _branchMsisdn, _branchLong, _branchLat, _branchState, _branchCategory, _imageUrl);
+    FirebaseBranchController().addBranch(uid, widget.additionalUid, _branchName, '0' + _branchMsisdn, _branchLong, _branchLat, _branchCity, _branchState, _branchCategory, _imageUrl);
     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
   }
 

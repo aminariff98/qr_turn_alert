@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/constants.dart';
-import 'package:qr_turn_alert/signup.dart';
 import 'package:qr_turn_alert/views/auth/sign-up.dart';
 
 class RoundedButton2 extends StatelessWidget {

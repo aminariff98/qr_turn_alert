@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/constants.dart';
-import 'package:qr_turn_alert/generate.dart';
 
 class Homepage extends StatefulWidget {
   @override
@@ -36,7 +35,7 @@ class _HomePageState extends State<Homepage> {
                             color: Colors.white,
                           )),
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => Generate()));
+                        // Navigator.of(context).push(MaterialPageRoute(builder: (context) => BranchQrCode(id: ,)));
                       },
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),

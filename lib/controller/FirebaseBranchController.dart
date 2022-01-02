@@ -5,7 +5,7 @@ import 'package:qr_turn_alert/models/BranchModel.dart';
 CollectionReference branch = FirebaseFirestore.instance.collection('branch');
 
 class FirebaseBranchController {
-  Future<void> addBranch(uid, additionalUid, branchName, branchMsisdn, branchLong, branchLat, branchState, branchCategory, branchImageUrl) {
+  Future<void> addBranch(uid, additionalUid, branchName, branchMsisdn, branchLong, branchLat, branchCity, branchState, branchCategory, branchImageUrl) {
     return branch
         .doc(uid + additionalUid)
         .set({
@@ -15,6 +15,7 @@ class FirebaseBranchController {
           'branchMsisdn': branchMsisdn,
           'branchLong': branchLong,
           'branchLat': branchLat,
+          'branchCity': branchCity,
           'branchState': branchState,
           'branchCategory': branchCategory,
           'branchImageUrl': branchImageUrl,
@@ -32,7 +33,7 @@ class FirebaseBranchController {
     return branchModel;
   }
 
-  Future<void> updateBranch(uid, branchName, branchMsisdn, branchLong, branchLat, branchState, branchCategory) {
+  Future<void> updateBranch(uid, branchName, branchMsisdn, branchLong, branchLat, branchCity, branchState, branchCategory) {
     return branch
         .doc(uid)
         .update({
@@ -40,6 +41,7 @@ class FirebaseBranchController {
           'branchMsisdn': branchMsisdn,
           'branchLong': branchLong,
           'branchLat': branchLat,
+          'branchCity': branchCity,
           'branchState': branchState,
           'branchCategory': branchCategory,
         })
