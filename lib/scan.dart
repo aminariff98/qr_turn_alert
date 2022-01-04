@@ -22,6 +22,7 @@ class _ScanState extends State<Scan> {
   void initState() {
     super.initState();
     EasyLoading.dismiss();
+    date = DateFormat('yyyy-MM-dd').format(now);
     scanQr();
   }
 
@@ -73,6 +74,7 @@ class _ScanState extends State<Scan> {
     dynamic scanned = (await BarcodeScanner.scan()).rawContent;
     qrResult = scanned.toString();
 
+    date = DateFormat('yyyy-MM-dd').format(now);
     time = DateFormat('HH:mm:ss').format(now);
 
     FirebaseQueController().addQue(uid, qrResult, fullName, date, time);
@@ -83,6 +85,5 @@ class _ScanState extends State<Scan> {
             builder: (context) => CustomerBranchDetail(
                   id: qrResult,
                 )));
-    // setState(() {});
   }
 }

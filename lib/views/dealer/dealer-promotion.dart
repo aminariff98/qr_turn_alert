@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/controller/FirebasePromotionController.dart';
@@ -106,15 +107,6 @@ class _DealerPromotionState extends State<DealerPromotion> {
 
   Widget promotionCard(promo) {
     return GestureDetector(
-      onLongPress: () {
-        showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (BuildContext context) {
-            return new BackdropFilter(filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), child: confirmDelete(context, promo['id']));
-          },
-        );
-      },
       onTap: () {
         Navigator.push(
           context,
@@ -126,23 +118,104 @@ class _DealerPromotionState extends State<DealerPromotion> {
         color: Colors.white,
         margin: EdgeInsets.fromLTRB(userScreenPadding, 0, userScreenPadding, userScreenPadding),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          padding: EdgeInsets.all(userScreenPadding),
-          color: Colors.transparent,
-          width: userScreenWidth,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.network(promo['imageUrl']),
-              SizedBox(
-                height: userScreenPadding / 2,
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            Container(
+              padding: EdgeInsets.all(userScreenPadding),
+              color: Colors.transparent,
+              width: userScreenWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [],
+                  ),
+                  Image.network(
+                    promo['imageUrl'],
+                    height: userScreenHeight * 0.25,
+                  ),
+                  SizedBox(
+                    height: userScreenPadding / 2,
+                  ),
+                  Text(
+                    promo['name'],
+                    style: Theme.of(context).textTheme.bodyText1!.apply(fontSizeDelta: userTextSize),
+                  ),
+                  SizedBox(
+                    height: userScreenPadding / 2,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      if (promo['status'] == 'active')
+                        showCupertinoDialog(
+                            context: context,
+                            builder: (_) => CupertinoAlertDialog(
+                                  title: Text("Are you sure?"),
+                                  content: Text("Do you want to change the promotion status? Customer won't see this promotion once the status is changed"),
+                                  actions: [
+                                    CupertinoButton(
+                                        child: Text('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        }),
+                                    CupertinoButton(
+                                      child: Text('Confirm'),
+                                      onPressed: () {
+                                        FirebasePromotionController().deletePromo(promo['id']);
+                                        Navigator.of(context).pop();
+                                      },
+                                    )
+                                  ],
+                                ));
+                    },
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    child: Container(
+                      padding: const EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        color: (promo['status'] == 'active') ? Colors.green : Colors.red,
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      ),
+                      child: Text(
+                        promo['status'],
+                        style: Theme.of(context).textTheme.bodyText1!.apply(fontSizeDelta: userTextSize, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                promo['name'],
-                style: Theme.of(context).textTheme.bodyText1!.apply(fontSizeDelta: userTextSize),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20),
+                  ),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (BuildContext context) {
+                        return new BackdropFilter(filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), child: confirmDelete(context, promo['id']));
+                      },
+                    );
+                  },
+                  child: Icon(
+                    Icons.close,
+                    size: 20,
+                    color: Colors.grey[600],
+                  ),
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -243,7 +316,7 @@ class _DealerPromotionState extends State<DealerPromotion> {
                       minVerticalPadding: 14,
                       onTap: () {
                         EasyLoading.show();
-                        FirebasePromotionController().deletePromo(id);
+                        FirebasePromotionController().permanenetDeletePromo(id);
                         Navigator.pop(context);
                         Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
                       },

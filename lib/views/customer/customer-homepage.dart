@@ -1,12 +1,13 @@
 import 'package:barcode_scan2/barcode_scan2.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/constants.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:qr_turn_alert/prequeue.dart';
-import 'dart:math';
 
 import 'package:qr_turn_alert/views/customer/customer-branch-category.dart';
+import 'package:qr_turn_alert/views/widgets/promotion-display.dart';
 
 class CustomerHomepage extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class CustomerHomepage extends StatefulWidget {
 
 class _CustomerHomepageState extends State<CustomerHomepage> {
   List notificationCategory = ['Restaurant', 'Bank / Service', 'Event', 'Takeaway / Delivery', 'Hospital / Clinic', 'Barber / Salon / Spa'];
+  var promoRef = FirebaseFirestore.instance.collection('promotion').snapshots();
 
   String qrResult = "Not yet Scanned";
   @override
@@ -46,6 +48,77 @@ class _CustomerHomepageState extends State<CustomerHomepage> {
       body: ListView(
         scrollDirection: Axis.vertical,
         children: <Widget>[
+          SizedBox(
+            height: userScreenPadding,
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(userScreenPadding, 0.0, userScreenPadding, userScreenPadding),
+            child: Text(
+              'Promotions',
+              style: Theme.of(context).textTheme.headline6!.apply(
+                    fontSizeDelta: userTextSize,
+                  ),
+            ),
+          ),
+          StreamBuilder(
+            stream: promoRef,
+            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              var items = [];
+              snapshot.data!.docs.map((DocumentSnapshot doc) {
+                items.add(doc);
+              }).toList();
+
+              return CarouselSlider(
+                options: CarouselOptions(
+                  height: userScreenHeight * 0.25,
+                  enlargeCenterPage: true,
+                  autoPlay: true,
+                  aspectRatio: 16 / 9,
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enableInfiniteScroll: true,
+                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  viewportFraction: 0.831,
+                ),
+                items: [
+                  for (var announcement in items)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PromotionDisplay(
+                                  imageUrl: announcement['imageUrl'], title: announcement['name'], description: announcement['description'], referralCode: announcement['referralCode'])),
+                        );
+                      },
+                      child: Hero(
+                        tag: announcement['imageUrl'],
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            image: DecorationImage(image: NetworkImage(announcement['imageUrl']), fit: BoxFit.fill),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(userScreenPadding, userScreenPadding, userScreenPadding, 0.0),
+            child: Text(
+              'Services',
+              style: Theme.of(context).textTheme.headline6!.apply(
+                    fontSizeDelta: userTextSize,
+                  ),
+            ),
+          ),
           Padding(
             padding: EdgeInsets.fromLTRB(userScreenPadding, userScreenPadding / 2, userScreenPadding, userScreenPadding),
             child: Wrap(

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/controller/FirebaseBranchController.dart';
 import 'package:qr_turn_alert/generate.dart';
-import 'package:qr_turn_alert/homepage.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:qr_turn_alert/models/BranchModel.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-branch-report.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-manage-que.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-promotion.dart';
 import 'package:qr_turn_alert/views/widgets/app-nav-bar.dart';
 
@@ -19,7 +20,7 @@ class DealerBranchDetail extends StatefulWidget {
 
 class _DealerBranchDetailState extends State<DealerBranchDetail> {
   late final DocumentReference<BranchModel> branchModel;
-  late String id, name, long, lat, state, category, contactNumber, image;
+  late String id, name, long, lat, city, state, category, contactNumber, image;
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
           image = data.get('branchImageUrl');
           lat = data.get('branchLat');
           long = data.get('branchLong');
+          city = data.get('branchCity');
           state = data.get('branchState');
           category = data.get('branchCategory');
           contactNumber = data.get('branchMsisdn');
@@ -87,7 +89,7 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                     height: userScreenPadding / 3,
                   ),
                   Text(
-                    '($lat, $long) $state',
+                    '$city, $state',
                     style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Color(0xff163567)),
                   ),
                   SizedBox(
@@ -112,36 +114,34 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(15),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => DealerPromotion(
-                                              id: id.toString(),
-                                            )),
-                                  );
-                                },
-                                child: Column(
-                                  children: <Widget>[
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
-                                      child: Image(
-                                        image: AssetImage('assets/icons/branch/promotion.png'),
-                                        fit: BoxFit.contain,
-                                      ),
-                                      height: (userScreenWidth * 0.25),
-                                      width: (userScreenWidth * 0.25),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DealerPromotion(
+                                            id: id.toString(),
+                                          )),
+                                );
+                              },
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
+                                    child: Image(
+                                      image: AssetImage('assets/icons/branch/promotion.png'),
+                                      fit: BoxFit.contain,
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
-                                      child: Text(
-                                        'Promotion',
-                                        style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
-                                      ),
+                                    height: (userScreenWidth * 0.25),
+                                    width: (userScreenWidth * 0.25),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
+                                    child: Text(
+                                      'Promotion',
+                                      style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -153,34 +153,32 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(15),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => Homepage()),
-                                  );
-                                },
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
-                                      child: Image(
-                                        image: AssetImage('assets/icons/branch/report.png'),
-                                        fit: BoxFit.contain,
-                                      ),
-                                      height: (userScreenWidth * 0.25),
-                                      width: (userScreenWidth * 0.25),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => DealerBranchReport(branchId: id)),
+                                );
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
+                                    child: Image(
+                                      image: AssetImage('assets/icons/branch/report.png'),
+                                      fit: BoxFit.contain,
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
-                                      child: Text(
-                                        'Report',
-                                        style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
-                                      ),
+                                    height: (userScreenWidth * 0.25),
+                                    width: (userScreenWidth * 0.25),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
+                                    child: Text(
+                                      'Report',
+                                      style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -192,34 +190,32 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(15),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => BranchQrCode(id: id)),
-                                  );
-                                },
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
-                                      child: Image(
-                                        image: AssetImage('assets/icons/branch/qr-code.png'),
-                                        fit: BoxFit.contain,
-                                      ),
-                                      height: (userScreenWidth * 0.25),
-                                      width: (userScreenWidth * 0.25),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => BranchQrCode(id: id)),
+                                );
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
+                                    child: Image(
+                                      image: AssetImage('assets/icons/branch/qr-code.png'),
+                                      fit: BoxFit.contain,
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
-                                      child: Text(
-                                        'Qr Code',
-                                        style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
-                                      ),
+                                    height: (userScreenWidth * 0.25),
+                                    width: (userScreenWidth * 0.25),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
+                                    child: Text(
+                                      'Qr Code',
+                                      style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -238,34 +234,32 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(15),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => BranchQrCode(id: id)),
-                                  );
-                                },
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
-                                      child: Image(
-                                        image: AssetImage('assets/icons/branch/qr-code.png'),
-                                        fit: BoxFit.contain,
-                                      ),
-                                      height: (userScreenWidth * 0.25),
-                                      width: (userScreenWidth * 0.25),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => DealerManageBranch(branchId: id)),
+                                );
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
+                                    child: Image(
+                                      image: AssetImage('assets/icons/branch/qr-code.png'),
+                                      fit: BoxFit.contain,
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
-                                      child: Text(
-                                        'Manage',
-                                        style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
-                                      ),
+                                    height: (userScreenWidth * 0.25),
+                                    width: (userScreenWidth * 0.25),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: userScreenWidth * 0.02),
+                                    child: Text(
+                                      'Manage',
+                                      style: Theme.of(context).textTheme.subtitle1!.apply(fontWeightDelta: 2, fontSizeDelta: userTextSize),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

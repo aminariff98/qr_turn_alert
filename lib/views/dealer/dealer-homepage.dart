@@ -158,7 +158,7 @@ class _DealerHomepageState extends State<DealerHomepage> {
   }
 
   Widget branchCard(branch) {
-    return GestureDetector(
+    return InkWell(
       onLongPress: () {
         showDialog(
           context: context,
