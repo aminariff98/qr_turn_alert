@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/config/config.dart';
+import 'package:qr_turn_alert/config/theme.dart';
 import 'package:qr_turn_alert/constants.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/views/auth/login.dart';
@@ -30,11 +31,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'QR Queue',
       builder: EasyLoading.init(),
-      theme: ThemeData(
-        primaryColor: kPrimaryColor,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      // home: SignUp(),
+      theme: theme(),
       home: FutureBuilder(
         future: _fbApp,
         builder: (context, snapshot) {

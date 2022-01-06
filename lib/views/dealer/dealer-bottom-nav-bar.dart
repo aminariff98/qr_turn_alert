@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:qr_turn_alert/scan.dart';
+import 'package:qr_turn_alert/views/dealer/dealer-create-branch.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-homepage.dart';
-import 'package:qr_turn_alert/queuepage1.dart';
 import 'package:qr_turn_alert/settings.dart';
+import 'package:pandabar/pandabar.dart';
 
 class DealerBottomNavBar extends StatefulWidget {
   @override
@@ -9,42 +11,53 @@ class DealerBottomNavBar extends StatefulWidget {
 }
 
 class _DealerBottomNavBarState extends State<DealerBottomNavBar> {
-  int _selectedIndex = 0;
-  List<Widget> _widgetOptions = <Widget>[
-    DealerHomepage(),
-    QueuePage1(),
-    SettingsPage(),
-  ];
-
-  void _onItemTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  String page = 'Home';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: Builder(
+        builder: (context) {
+          switch (page) {
+            case 'Home':
+              return DealerHomepage();
+            case 'Profile':
+              return SettingsPage();
+            default:
+              return Container();
+          }
+        },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.insert_chart),
-            label: 'Queue',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+      bottomNavigationBar: PandaBar(
+        buttonColor: Colors.white70,
+        buttonSelectedColor: Color(0xFFAD1F61),
+        fabColors: [
+          Color(0xFFAD1F61),
+          Color(0xFFAD1F61),
         ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTap,
+        fabIcon: Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 26,
+        ),
+        buttonData: [
+          PandaBarButtonData(id: 'Home', icon: Icons.dashboard, title: 'Home'),
+          PandaBarButtonData(id: 'Profile', icon: Icons.book, title: 'Profile'),
+        ],
+        onChange: (id) {
+          setState(() {
+            page = id;
+          });
+        },
+        onFabButtonPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RegisterBranch(
+                  additionalUid: branchCount.toString(),
+                ),
+              ));
+        },
       ),
     );
   }

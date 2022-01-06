@@ -63,7 +63,10 @@ class _DealerManageBranchState extends State<DealerManageBranch> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.timer),
+                        Icon(
+                          Icons.timer,
+                          color: Colors.black,
+                        ),
                         SizedBox(
                           width: userScreenPadding,
                         ),

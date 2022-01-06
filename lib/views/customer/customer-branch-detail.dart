@@ -103,7 +103,7 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
                                     }
 
                                     snapshot.data!.docs.map((DocumentSnapshot doc) {
-                                      if (doc['status'] == 'active') count++;
+                                      if (doc['status'] == 'active' && doc['branchId'] == id) count++;
                                     }).toList();
 
                                     return Row(

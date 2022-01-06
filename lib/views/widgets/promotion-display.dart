@@ -23,7 +23,7 @@ class PromotionDisplay extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(imageUrl),
+            Center(child: Hero(tag: imageUrl, child: Image.network(imageUrl))),
             SizedBox(
               height: userScreenPadding,
             ),
@@ -47,15 +47,19 @@ class PromotionDisplay extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: SafeArea(
-          child: Padding(
-        padding: EdgeInsets.only(bottom: userScreenPadding),
-        child: Text(
-          'Promo Code : ' + referralCode,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headline6!.apply(fontSizeDelta: userTextSize),
-        ),
-      )),
+      bottomNavigationBar: (referralCode != '')
+          ? SafeArea(
+              child: Padding(
+              padding: EdgeInsets.only(bottom: userScreenPadding),
+              child: Text(
+                'Promo Code : ' + referralCode,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline6!.apply(fontSizeDelta: userTextSize),
+              ),
+            ))
+          : Container(
+              height: 0,
+            ),
     );
   }
 }

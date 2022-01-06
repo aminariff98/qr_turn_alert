@@ -45,6 +45,7 @@ dependencies:
   url_launcher: ^6.0.9
   pandabar: ^0.1.2
   carousel_slider: ^4.0.0
+  flutter_custom_clippers: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -246,7 +246,7 @@ class _DealerBranchDetailState extends State<DealerBranchDetail> {
                                   Container(
                                     padding: EdgeInsets.only(bottom: userScreenWidth * 0.02, top: userScreenWidth * 0.02),
                                     child: Image(
-                                      image: AssetImage('assets/icons/branch/qr-code.png'),
+                                      image: AssetImage('assets/icons/branch/manage.png'),
                                       fit: BoxFit.contain,
                                     ),
                                     height: (userScreenWidth * 0.25),

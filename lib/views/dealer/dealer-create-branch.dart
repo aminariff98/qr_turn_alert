@@ -622,7 +622,7 @@ class _RegisterBranchState extends State<RegisterBranch> {
               ),
             );
           } else {
-            uploadFile(_branchAttachment);
+            _downloadLink();
           }
         },
       ),
@@ -640,11 +640,9 @@ class _RegisterBranchState extends State<RegisterBranch> {
 
     firebase_storage.UploadTask uploadTask;
 
-    EasyLoading.show();
     // Create a Reference to the file
     firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('branch').child('/$uid' + widget.additionalUid + '.jpg');
 
-    _downloadLink(ref);
     final metadata = firebase_storage.SettableMetadata(contentType: 'image/jpeg', customMetadata: {'picked-file-path': file.path});
 
     if (kIsWeb) {
@@ -656,10 +654,10 @@ class _RegisterBranchState extends State<RegisterBranch> {
     return Future.value(uploadTask);
   }
 
-  Future<void> _downloadLink(firebase_storage.Reference ref) async {
-    final link = await ref.getDownloadURL();
-
-    _registerBranch(link);
+  Future<void> _downloadLink() async {
+    EasyLoading.show();
+    final link = await firebase_storage.FirebaseStorage.instance.ref('branch/$uid' + widget.additionalUid + '.jpg').getDownloadURL();
+    await _registerBranch(link);
   }
 
   _registerBranch(_imageUrl) async {
@@ -679,6 +677,7 @@ class _RegisterBranchState extends State<RegisterBranch> {
       if (image != null) {
         if (source == "branchAttachment") {
           _branchAttachment = image;
+          uploadFile(_branchAttachment);
         }
       }
     });
@@ -695,6 +694,7 @@ class _RegisterBranchState extends State<RegisterBranch> {
       if (image != null) {
         if (source == "branchAttachment") {
           _branchAttachment = image;
+          uploadFile(_branchAttachment);
         }
       }
     });

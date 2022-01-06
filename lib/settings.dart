@@ -3,12 +3,12 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_turn_alert/constants.dart';
 import 'package:qr_turn_alert/controller/FirebaseUserController.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/models/UserModel.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-account-detail.dart';
+import 'package:qr_turn_alert/views/widgets/about-app.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -44,12 +44,12 @@ class _SettingsPageState extends State<SettingsPage> {
         _accountType = data.get('accountType');
 
         return Scaffold(
-          backgroundColor: kPrimaryColor,
+          backgroundColor: Color.fromRGBO(173, 31, 97, 1),
           appBar: AppBar(
             title: Text('Profile'),
             centerTitle: true,
             automaticallyImplyLeading: false,
-            backgroundColor: kPrimaryColor,
+            backgroundColor: Color.fromRGBO(173, 31, 97, 1),
             elevation: 0,
           ),
           body: Column(
@@ -57,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.only(left: userScreenPadding, right: userScreenPadding),
@@ -67,29 +67,26 @@ class _SettingsPageState extends State<SettingsPage> {
                       backgroundImage: AssetImage('assets/icons/profile/profile.png'),
                     ),
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          "$_name",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "$_name",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                        Text(
-                          (_accountType == 'dealer') ? 'Business Account' : 'Normal Account',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
-                    ),
+                      ),
+                      Text(
+                        (_accountType == 'dealer') ? 'Business Account' : 'Normal Account',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      )
+                    ],
                   ),
                   SizedBox(
                     width: userScreenPadding,
@@ -103,23 +100,62 @@ class _SettingsPageState extends State<SettingsPage> {
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
                   child: Container(
                     margin: EdgeInsets.all(10),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 20,
-                        ),
-                        if (_accountType == 'customer') ...[
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 20,
+                          ),
+                          if (_accountType == 'customer') ...[
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.volume_up_outlined,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  "Notifications",
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Divider(
+                              height: 15,
+                              thickness: 2,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            ListTile(
+                              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                              title: Text('Notification'),
+                              trailing: CupertinoSwitch(
+                                value: notification,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    notification = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                          SizedBox(
+                            height: 40,
+                          ),
                           Row(
                             children: [
                               Icon(
-                                Icons.volume_up_outlined,
+                                Icons.settings,
                                 color: Colors.black,
                               ),
                               SizedBox(
                                 width: 8,
                               ),
                               Text(
-                                "Notifications",
+                                "Settings",
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -128,152 +164,77 @@ class _SettingsPageState extends State<SettingsPage> {
                             height: 15,
                             thickness: 2,
                           ),
-                          SizedBox(
-                            height: 10,
+                          ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                            title: Text('Account'),
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              size: 24,
+                              color: Colors.grey,
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                new MaterialPageRoute(builder: (context) => DealerAccountDetail()),
+                              );
+                            },
                           ),
                           ListTile(
                             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
-                            title: Text('Notification'),
-                            trailing: CupertinoSwitch(
-                              value: notification,
-                              onChanged: (bool value) {
-                                setState(() {
-                                  notification = value;
-                                });
-                              },
+                            title: Text('Language'),
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              size: 24,
+                              color: Colors.grey,
                             ),
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Sorry, this feature will be available soon',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                            title: Text('About App'),
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              size: 24,
+                              color: Colors.grey,
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                new MaterialPageRoute(builder: (context) => AboutApp()),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                            title: Text('Logout'),
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              size: 24,
+                              color: Colors.grey,
+                            ),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) {
+                                  return new BackdropFilter(filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), child: logout(context));
+                                },
+                              );
+                            },
+                          ),
+                          SizedBox(
+                            height: userScreenPadding,
                           ),
                         ],
-                        SizedBox(
-                          height: 40,
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.settings,
-                              color: Colors.black,
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Text(
-                              "Settings",
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                        Divider(
-                          height: 15,
-                          thickness: 2,
-                        ),
-                        ListTile(
-                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
-                          title: Text('Account'),
-                          trailing: Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                            color: Colors.grey,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              new MaterialPageRoute(builder: (context) => DealerAccountDetail()),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
-                          title: Text('Language'),
-                          trailing: Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                            color: Colors.grey,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              new MaterialPageRoute(builder: (context) => DealerAccountDetail()),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
-                          title: Text('About App'),
-                          trailing: Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                            color: Colors.grey,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              new MaterialPageRoute(builder: (context) => DealerAccountDetail()),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
-                          title: Text('Logout'),
-                          trailing: Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                            color: Colors.grey,
-                          ),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (BuildContext context) {
-                                return new BackdropFilter(filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), child: logout(context));
-                              },
-                            );
-                          },
-                        ),
-                        // Spacer(),
-                        // Container(
-                        //   constraints: BoxConstraints(maxWidth: userScreenWidth * 0.4),
-                        //   child: ElevatedButton(
-                        //       style: ElevatedButton.styleFrom(
-                        //         primary: Colors.transparent,
-                        //         onPrimary: Colors.transparent,
-                        //         textStyle: TextStyle(color: Colors.white),
-                        //         padding: EdgeInsets.zero,
-                        //         elevation: 3,
-                        //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                        //       ),
-                        //       child: Container(
-                        //         decoration: BoxDecoration(
-                        //           borderRadius: BorderRadius.circular(50.0),
-                        //           gradient: LinearGradient(
-                        //             colors: <Color>[
-                        //               Color.fromRGBO(173, 31, 97, 1),
-                        //               Color.fromRGBO(70, 0, 106, 1),
-                        //             ],
-                        //           ),
-                        //         ),
-                        //         child: Text(
-                        //           'Logout',
-                        //           style: Theme.of(context).textTheme.button!.apply(
-                        //                 color: Colors.white,
-                        //                 fontSizeDelta: userTextSize,
-                        //               ),
-                        //         ),
-                        //         padding: EdgeInsets.symmetric(vertical: userScreenPadding / 1.5, horizontal: userScreenPadding * 2),
-                        //       ),
-                        //       onPressed: () {
-                        //         showDialog(
-                        //           context: context,
-                        //           barrierDismissible: true,
-                        //           builder: (BuildContext context) {
-                        //             return new BackdropFilter(filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), child: logout(context));
-                        //           },
-                        //         );
-                        //       }),
-                        // ),
-                        SizedBox(
-                          height: userScreenPadding,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

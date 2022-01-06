@@ -4,7 +4,6 @@ import 'package:qr_turn_alert/scan.dart';
 import 'package:qr_turn_alert/settings.dart';
 import 'package:qr_turn_alert/views/customer/customer-homepage.dart';
 import 'package:pandabar/pandabar.dart';
-import 'package:barcode_scan2/barcode_scan2.dart';
 
 class CustomerBottomNavBar extends StatefulWidget {
   @override

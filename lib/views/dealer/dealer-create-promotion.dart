@@ -346,7 +346,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
           ),
           padding: EdgeInsets.symmetric(vertical: 8),
         ),
-        onPressed: () {
+        onPressed: () async {
           if (_name == '' || _description == '') {
             // await Clipboard.setData(ClipboardData(
             //   text: link,
@@ -359,7 +359,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
               ),
             );
           } else {
-            uploadFile(_promotionAttachment);
+            _downloadLink();
           }
         },
       ),
@@ -377,11 +377,9 @@ class _CreatePromotionState extends State<CreatePromotion> {
 
     firebase_storage.UploadTask uploadTask;
 
-    EasyLoading.show();
     // Create a Reference to the file
     firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('promotion').child('/' + widget.id + widget.additionalId + '.jpg');
 
-    _downloadLink(ref);
     final metadata = firebase_storage.SettableMetadata(contentType: 'image/jpeg', customMetadata: {'picked-file-path': file.path});
 
     if (kIsWeb) {
@@ -393,13 +391,17 @@ class _CreatePromotionState extends State<CreatePromotion> {
     return Future.value(uploadTask);
   }
 
-  Future<void> _downloadLink(firebase_storage.Reference ref) async {
-    final link = await ref.getDownloadURL();
+  Future<void> _downloadLink() async {
+    EasyLoading.show();
+    final link = await firebase_storage.FirebaseStorage.instance.ref('promotion/' + widget.id + widget.additionalId + '.jpg').getDownloadURL();
+
+    // final link = await ref.getDownloadURL();
+
     EasyLoading.dismiss();
-    FirebasePromotionController().addPromo(uid, widget.id, widget.additionalId, _name, _description, _referralCode, link);
+    await FirebasePromotionController().addPromo(uid, widget.id, widget.additionalId, _name, _description, _referralCode, link);
     Navigator.pop(context);
     Navigator.pop(context);
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => DealerPromotion(id: widget.id)),
     );
@@ -416,6 +418,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
       if (image != null) {
         if (source == "branchAttachment") {
           _promotionAttachment = image;
+          uploadFile(_promotionAttachment);
         }
       }
     });
@@ -432,6 +435,7 @@ class _CreatePromotionState extends State<CreatePromotion> {
       if (image != null) {
         if (source == "branchAttachment") {
           _promotionAttachment = image;
+          uploadFile(_promotionAttachment);
         }
       }
     });

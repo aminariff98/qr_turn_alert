@@ -77,13 +77,15 @@ class _ScanState extends State<Scan> {
     date = DateFormat('yyyy-MM-dd').format(now);
     time = DateFormat('HH:mm:ss').format(now);
 
-    FirebaseQueController().addQue(uid, qrResult, fullName, date, time);
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CustomerBottomNavBar()), (Route<dynamic> route) => false);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => CustomerBranchDetail(
-                  id: qrResult,
-                )));
+    if (qrResult != '') {
+      FirebaseQueController().addQue(uid, qrResult, fullName, date, time);
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CustomerBottomNavBar()), (Route<dynamic> route) => false);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CustomerBranchDetail(
+                    id: qrResult,
+                  )));
+    }
   }
 }

@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/controller/FirebaseBranchController.dart';
 import 'package:qr_turn_alert/controller/FirebaseUserController.dart';
-import 'package:qr_turn_alert/constants.dart';
 import 'package:qr_turn_alert/main.dart';
-import 'package:qr_turn_alert/models/BranchModel.dart';
 import 'package:qr_turn_alert/models/UserModel.dart';
-import 'package:qr_turn_alert/prequeue.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-branch-detail.dart';
-import 'package:qr_turn_alert/views/dealer/dealer-create-branch.dart';
+import 'package:qr_turn_alert/views/widgets/app-nav-bar-curve.dart';
+
+int branchCount = 0;
 
 class DealerHomepage extends StatefulWidget {
   final fullName;
@@ -28,132 +27,168 @@ class _DealerHomepageState extends State<DealerHomepage> {
   var branches = [];
   late int count = 0;
   late final DocumentReference<UserModel> userModel;
-  // ignore: top_level_function_literal_block
-  var branchRef = FirebaseFirestore.instance.collection('branch').get().then((QuerySnapshot querySnapshot) {});
+  var branchRef = FirebaseFirestore.instance.collection('branch').snapshots();
   @override
   void initState() {
     super.initState();
     EasyLoading.dismiss();
     userModel = FirebaseUserController().getUser(uid);
-    FirebaseFirestore.instance.collection('branch').get().then((QuerySnapshot querySnapshot) {
-      branches = querySnapshot.docs;
-      querySnapshot.docs.forEach((doc) {
-        if (doc["uid"] == uid) {
-          count++;
-        }
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(""),
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: kPrimaryColor,
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.radio_button_off_rounded,
-              color: kPrimaryColor,
-              size: 10,
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Container(
+              height: userScreenHeight,
+              child: AppNavBarCurve(title: '', backButton: false),
             ),
-            padding: const EdgeInsets.only(right: 15),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PreQueuePage()),
-              );
-            },
-          )
-        ],
-      ),
-      body: ListView(
-        scrollDirection: Axis.vertical,
-        children: <Widget>[
-          StreamBuilder<DocumentSnapshot<UserModel>>(
-            stream: userModel.snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text(snapshot.error.toString()),
-                );
-              }
+            Column(
+              children: <Widget>[
+                SizedBox(
+                  height: (kToolbarHeight * 1.5),
+                ),
+                StreamBuilder<DocumentSnapshot<UserModel>>(
+                  stream: userModel.snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(snapshot.error.toString()),
+                      );
+                    }
 
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-              final data = snapshot.requireData;
-              fullName = data.get('fullName');
+                    final data = snapshot.requireData;
+                    fullName = data.get('fullName');
 
-              return Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: kPrimaryColor,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
+                    return Center(
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(userScreenPadding, 0, userScreenPadding, userScreenPadding / 2),
+                        child: Text("Welcome, $fullName !", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    );
+                  },
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(userScreenPadding, 0, userScreenPadding, userScreenPadding / 2),
+                  child: Center(
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyText2,
+                        children: <TextSpan>[
+                          TextSpan(text: 'Organize your ', style: Theme.of(context).textTheme.bodyText1!.apply(color: Colors.white, fontSizeDelta: 8)),
+                          TextSpan(text: 'Business\n', style: Theme.of(context).textTheme.bodyText1!.apply(color: Color(0xFFf77f00), fontSizeDelta: 8)),
+                          TextSpan(text: '& ', style: Theme.of(context).textTheme.bodyText1!.apply(color: Colors.white, fontSizeDelta: 8)),
+                          TextSpan(text: 'Promotion', style: Theme.of(context).textTheme.bodyText1!.apply(color: Color(0xFFf77f00), fontSizeDelta: 8)),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                child: Text("Welcome $fullName", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-              );
-            },
-          ),
-          SizedBox(
-            height: userScreenPadding,
-          ),
-          FutureBuilder(
-            future: branchRef,
-            builder: (context, AsyncSnapshot<BranchModel?> snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return const Center(child: CircularProgressIndicator());
-              } else {
-                if (branches.length > 0) {
-                  return Column(
-                    children: [
-                      for (int i = 0; i < branches.length; i++)
-                        if (branches[i]['uid'] == uid) branchCard(branches[i]),
-                      SizedBox(
-                        height: userScreenPadding / 2,
-                      )
-                    ],
-                  );
-                } else {
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: userScreenHeight * 0.35,
-                      ),
-                      Center(
-                          child: Text(
-                        'Opps ! There\'s no branch yet',
-                        style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
-                    ],
-                  );
-                }
-              }
-            },
-          ),
-        ],
+                SizedBox(
+                  height: userScreenPadding,
+                ),
+                StreamBuilder(
+                    stream: branchRef,
+                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (!snapshot.hasData) {
+                        branches = [];
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      branches = [];
+
+                      snapshot.data!.docs.map((DocumentSnapshot doc) {
+                        if (doc["uid"] == uid) {
+                          branches.add(doc);
+                        }
+                      }).toList();
+
+                      branchCount = branches.length;
+
+                      if (branches.length > 0) {
+                        return Column(
+                          children: [
+                            for (int i = 0; i < branches.length; i++)
+                              if (branches[i]['uid'] == uid) branchCard(branches[i]),
+                            SizedBox(
+                              height: userScreenPadding / 2,
+                            )
+                          ],
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            SizedBox(
+                              height: userScreenHeight * 0.35,
+                            ),
+                            Center(
+                                child: Text(
+                              'Opps ! There\'s no branch yet',
+                              style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                            )),
+                          ],
+                        );
+                      }
+                    }),
+                // FutureBuilder(
+                //   future: branchRef,
+                //   builder: (context, AsyncSnapshot<BranchModel?> snapshot) {
+                //     if (snapshot.connectionState != ConnectionState.done) {
+                //       return const Center(child: CircularProgressIndicator());
+                //     } else {
+                //       if (branches.length > 0) {
+                //         return Column(
+                //           children: [
+                //             for (int i = 0; i < branches.length; i++)
+                //               if (branches[i]['uid'] == uid) branchCard(branches[i]),
+                //             SizedBox(
+                //               height: userScreenPadding / 2,
+                //             )
+                //           ],
+                //         );
+                //       } else {
+                //         return Column(
+                //           children: [
+                //             SizedBox(
+                //               height: userScreenHeight * 0.35,
+                //             ),
+                //             Center(
+                //                 child: Text(
+                //               'Opps ! There\'s no branch yet',
+                //               style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                //             )),
+                //           ],
+                //         );
+                //       }
+                //     }
+                //   },
+                // ),
+              ],
+            ),
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => RegisterBranch(
-                      additionalUid: count.toString(),
-                    )),
-          );
-        },
-        backgroundColor: Color.fromRGBO(173, 31, 97, 1),
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //           builder: (context) => RegisterBranch(
+      //                 additionalUid: count.toString(),
+      //               )),
+      //     );
+      //   },
+      //   backgroundColor: Color.fromRGBO(173, 31, 97, 1),
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 
