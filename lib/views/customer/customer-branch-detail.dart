@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:qr_turn_alert/controller/FirebaseBranchController.dart';
 import 'package:qr_turn_alert/controller/FirebaseQueController.dart';
 import 'package:qr_turn_alert/main.dart';
@@ -8,6 +10,15 @@ import 'package:qr_turn_alert/models/BranchModel.dart';
 import 'package:qr_turn_alert/views/widgets/app-nav-bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:rxdart/rxdart.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject = BehaviorSubject<ReceivedNotification>();
+final BehaviorSubject<String?> selectNotificationSubject = BehaviorSubject<String?>();
+
+String? selectedNotificationPayload;
+FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
 
 class CustomerBranchDetail extends StatefulWidget {
   final dynamic id;
@@ -101,7 +112,7 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
                                         child: CircularProgressIndicator(),
                                       );
                                     }
-
+                                    count = 0;
                                     snapshot.data!.docs.map((DocumentSnapshot doc) {
                                       if (doc['status'] == 'active' && doc['branchId'] == id) count++;
                                     }).toList();
@@ -217,6 +228,7 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
                                     GestureDetector(
                                       onTap: () {
                                         FirebaseQueController().updateQue('$uid-' + id + '-$date');
+                                        _cancelAllNotifications();
                                       },
                                       child: Text(
                                         'Cancel Que',
@@ -297,7 +309,7 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
         ),
         onPressed: () {
           time = DateFormat('HH:mm:ss').format(now);
-
+          if (notification) setNotification();
           FirebaseQueController().addQue(uid, id, fullName, date, time);
         },
       ),
@@ -311,5 +323,24 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  Future<void> setNotification() async {
+    var androidSpecifics = AndroidNotificationDetails(
+      'test id',
+      'test notification',
+      priority: Priority.max,
+      importance: Importance.high,
+      when: tz.TZDateTime.now(tz.local).add(const Duration(minutes: 3)).millisecondsSinceEpoch,
+    );
+    var iOSSpecifics = const IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(android: androidSpecifics, iOS: iOSSpecifics);
+
+    await FlutterLocalNotificationsPlugin().zonedSchedule(1000, 'VQueue', 'Check number in line', tz.TZDateTime.now(tz.local).add(const Duration(minutes: 3)), platformChannelSpecifics,
+        androidAllowWhileIdle: true, uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime);
+  }
+
+  Future<void> _cancelAllNotifications() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
 }

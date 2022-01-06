@@ -275,8 +275,8 @@ class _QueueDetailsState extends State<QueueDetails> {
   }
 
   Future<void> displayNotification(String match) async {
-    notificationsPlugin.zonedSchedule(0, match, 'This is a notification to indicate that it is currrently your turn for the queue', tz.TZDateTime.now(tz.local).add(Duration(seconds: 20)),
-        NotificationDetails(android: AndroidNotificationDetails('channel id', 'channel name', 'channel description')),
+    notificationsPlugin.zonedSchedule(0, match, 'This is a notification to indicate that it is currrently your turn for the queue', tz.TZDateTime.now(tz.local).add(Duration(minutes: 3)),
+        NotificationDetails(android: AndroidNotificationDetails('channel id', 'channel name', channelDescription: 'channel description')),
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, androidAllowWhileIdle: true);
   }
 }
