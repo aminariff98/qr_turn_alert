@@ -331,12 +331,12 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
       'test notification',
       priority: Priority.max,
       importance: Importance.high,
-      when: tz.TZDateTime.now(tz.local).add(const Duration(minutes: 3)).millisecondsSinceEpoch,
+      when: tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10)).millisecondsSinceEpoch,
     );
     var iOSSpecifics = const IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(android: androidSpecifics, iOS: iOSSpecifics);
 
-    await FlutterLocalNotificationsPlugin().zonedSchedule(1000, 'VQueue', 'Check number in line', tz.TZDateTime.now(tz.local).add(const Duration(minutes: 3)), platformChannelSpecifics,
+    await FlutterLocalNotificationsPlugin().zonedSchedule(1000, 'VQueue', 'Check number in line', tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10)), platformChannelSpecifics,
         androidAllowWhileIdle: true, uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime);
   }
 
