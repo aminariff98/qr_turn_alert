@@ -67,16 +67,15 @@ class _DealerBranchReportState extends State<DealerBranchReport> {
         selectedMonthName.add(monthList[11]);
         selectedMonthName.add(monthList[10]);
         break;
-      }
-      if (i == 1 && month == checkMonthList[i]) {
+      } else if (i == 1 && month == checkMonthList[1]) {
         selectedMonth.add(month);
-        selectedMonth.add(checkMonthList[i - 1]);
+        selectedMonth.add(checkMonthList[0]);
         selectedMonth.add(checkMonthList[11]);
         selectedMonthName.add(monthList[i]);
-        selectedMonthName.add(monthList[i - 1]);
+        selectedMonthName.add(monthList[0]);
         selectedMonthName.add(monthList[11]);
         break;
-      } else {
+      } else if (i >= 2) {
         for (int q = 0; q < 3; q++) {
           var index = checkMonthList.indexWhere((month) => month == monthName);
           selectedMonth.add(checkMonthList[index - q]);
@@ -113,20 +112,20 @@ class _DealerBranchReportState extends State<DealerBranchReport> {
                   child: CircularProgressIndicator(),
                 );
               }
-
               snapshot.data!.docs.map((DocumentSnapshot doc) {
+                print(doc['branchId'] == widget.branchId);
                 if (doc['status'] == 'completed' && doc['branchId'] == widget.branchId) {
                   count++;
                   docs.add(doc);
-                }
-                if (doc['month'] == selectedMonth[0]) {
-                  monthlyRecords[0] += 1;
-                }
-                if (doc['month'] == selectedMonth[1]) {
-                  monthlyRecords[1] += 1;
-                }
-                if (doc['month'] == selectedMonth[2]) {
-                  monthlyRecords[2] += 1;
+                  if (doc['month'] == selectedMonth[0]) {
+                    monthlyRecords[0] += 1;
+                  }
+                  if (doc['month'] == selectedMonth[1]) {
+                    monthlyRecords[1] += 1;
+                  }
+                  if (doc['month'] == selectedMonth[2]) {
+                    monthlyRecords[2] += 1;
+                  }
                 }
               }).toList();
               return Column(

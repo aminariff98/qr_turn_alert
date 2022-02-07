@@ -111,7 +111,7 @@ class _DealerHomepageState extends State<DealerHomepage> {
                         }
                       }).toList();
 
-                      branchCount = branches.length;
+                      branchCount = branches.length + 1;
 
                       if (branches.length > 0) {
                         return Column(
