@@ -77,13 +77,14 @@ class _DealerBranchReportState extends State<DealerBranchReport> {
         break;
       } else if (i >= 2) {
         for (int q = 0; q < 3; q++) {
-          var index = checkMonthList.indexWhere((month) => month == monthName);
+          var index = checkMonthList.indexWhere((x) => x == month);
           selectedMonth.add(checkMonthList[index - q]);
           selectedMonthName.add(monthList[index - q]);
         }
         break;
       }
     }
+    print(selectedMonthName[0]);
 
     EasyLoading.dismiss();
   }
@@ -155,6 +156,7 @@ class _DealerBranchReportState extends State<DealerBranchReport> {
   }
 
   Widget informationCard(index) {
+    print(index);
     return Card(
       color: Colors.white,
       margin: EdgeInsets.fromLTRB(userScreenPadding, userScreenPadding / 2, userScreenPadding, userScreenPadding / 3),

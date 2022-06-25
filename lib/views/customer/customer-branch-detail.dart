@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -117,20 +116,37 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
                                       if (doc['status'] == 'active' && doc['branchId'] == id) count++;
                                     }).toList();
 
-                                    return Row(
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Icon(Icons.timer),
-                                        Text(
-                                          ' Waiting : ',
-                                          style: Theme.of(context).textTheme.subtitle2!.apply(fontSizeDelta: userTextSize),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Icon(
+                                              Icons.timer,
+                                              color: Color(0xff163567),
+                                            ),
+                                            Text(
+                                              ' Waiting : ',
+                                              style: Theme.of(context).textTheme.subtitle2!.apply(fontSizeDelta: userTextSize),
+                                            ),
+                                            SizedBox(
+                                              width: userScreenPadding,
+                                            ),
+                                            Text(
+                                              count.toString(),
+                                              style: Theme.of(context).textTheme.bodyText1!.apply(fontSizeDelta: userTextSize),
+                                            ),
+                                          ],
                                         ),
                                         SizedBox(
-                                          width: userScreenPadding,
+                                          height: userScreenPadding / 2,
                                         ),
-                                        Text(
-                                          count.toString(),
-                                          style: Theme.of(context).textTheme.bodyText1!.apply(fontSizeDelta: userTextSize),
-                                        ),
+                                        if (count != 0)
+                                          Text(
+                                            'Estimated Time : 5 minutes',
+                                            style: Theme.of(context).textTheme.subtitle2!.apply(fontSizeDelta: userTextSize),
+                                          ),
                                       ],
                                     );
                                   }),
@@ -253,7 +269,23 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
             ),
           ),
           bottomNavigationBar: SafeArea(
-            child: getSubmitButton(),
+            child: StreamBuilder(
+              stream: queRef,
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return SizedBox();
+                }
+                bool enableQueue = false;
+                snapshot.data!.docs.map((DocumentSnapshot doc) {
+                  (doc['uid'] == uid && doc['branchId'] == id && doc['date'] == date.toString() && doc['status'] == 'active')
+                      ? enableQueue = true
+                      : {
+                          if (enableQueue) {enableQueue = true} else {enableQueue = false}
+                        };
+                }).toList();
+                return (!enableQueue) ? getSubmitButton() : SizedBox();
+              },
+            ),
           ),
         );
       },
@@ -318,8 +350,8 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
 
   _launchURL() async {
     var url = 'https://www.google.com/maps/search/' + lat + ',' + long;
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await launchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       throw 'Could not launch $url';
     }
@@ -336,7 +368,7 @@ class _CustomerBranchDetailState extends State<CustomerBranchDetail> {
     var iOSSpecifics = const IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(android: androidSpecifics, iOS: iOSSpecifics);
 
-    await FlutterLocalNotificationsPlugin().zonedSchedule(1000, 'VQueue', 'Check number in line', tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10)), platformChannelSpecifics,
+    await FlutterLocalNotificationsPlugin().zonedSchedule(1000, 'Dear Customer', 'Check number in line', tz.TZDateTime.now(tz.local).add(const Duration(seconds: 3)), platformChannelSpecifics,
         androidAllowWhileIdle: true, uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime);
   }
 

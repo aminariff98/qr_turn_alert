@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
    <application
-        android:label="qr_turn_alert"
+        android:label="QueePro"
         android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"

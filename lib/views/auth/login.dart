@@ -80,15 +80,21 @@ class _LoginState extends State<Login> {
           ),
           SingleChildScrollView(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: userScreenHeight * 0.2),
-                Center(
-                  child: Container(
-                    width: userScreenWidth * 0.65,
-                    height: userScreenHeight * 0.16,
-                    child: Image(
-                      image: AssetImage('assets/icons/app/queue.png'),
-                    ),
+                SizedBox(height: userScreenHeight * 0.15),
+                Text(
+                  'Welcome to QueePro !',
+                  style: Theme.of(context).textTheme.headline1!.apply(color: Colors.white, fontSizeDelta: 10.0 + userTextSize),
+                ),
+                SizedBox(
+                  height: userScreenPadding * 2,
+                ),
+                Container(
+                  width: userScreenWidth * 0.65,
+                  height: userScreenHeight * 0.16,
+                  child: Image(
+                    image: AssetImage('assets/icons/app/queue.png'),
                   ),
                 ),
                 Card(

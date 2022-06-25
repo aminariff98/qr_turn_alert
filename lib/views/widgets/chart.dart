@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_turn_alert/main.dart';
 
@@ -69,33 +68,33 @@ class _ChartState extends State<Chart> {
     // return Container();
     final lineBarsData = [
       LineChartBarData(
-          showingIndicators: showIndexes,
-          spots: amount,
-          isCurved: true,
-          barWidth: 3,
-          shadow: const Shadow(
-            blurRadius: 8,
-            color: Colors.black,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            colors: [
-              const Color(0xff12c2e9).withOpacity(0.4),
-              const Color(0xffc471ed).withOpacity(0.4),
-              const Color(0xfff64f59).withOpacity(0.4),
-            ],
-          ),
-          dotData: FlDotData(show: false),
-          colors: [
-            const Color(0xff12c2e9),
-            const Color(0xffc471ed),
-            const Color(0xfff64f59),
-          ],
-          colorStops: [
-            0.1,
-            0.4,
-            0.9
-          ]),
+        showingIndicators: showIndexes,
+        spots: amount,
+        isCurved: true,
+        barWidth: 3,
+        shadow: const Shadow(
+          blurRadius: 8,
+          color: Colors.black,
+        ),
+        belowBarData: BarAreaData(
+          show: true,
+
+          color: const Color(0xff12c2e9).withOpacity(0.4),
+          // colors: [
+          //   const Color(0xff12c2e9).withOpacity(0.4),
+          //   const Color(0xffc471ed).withOpacity(0.4),
+          //   const Color(0xfff64f59).withOpacity(0.4),
+          // ],
+        ),
+        dotData: FlDotData(show: false),
+        color: const Color(0xff12c2e9),
+        // colors: [
+        //   const Color(0xff12c2e9),
+        //   const Color(0xffc471ed),
+        //   const Color(0xfff64f59),
+        // ],
+        // colorStops: [0.1, 0.4, 0.9],
+      ),
     ];
 
     final LineChartBarData tooltipsOnBar = lineBarsData[0];
@@ -105,8 +104,12 @@ class _ChartState extends State<Chart> {
       child: LineChart(
         LineChartData(
           showingTooltipIndicators: showIndexes.map((index) {
-            return ShowingTooltipIndicators(index, [
-              LineBarSpot(tooltipsOnBar, lineBarsData.indexOf(tooltipsOnBar), tooltipsOnBar.spots[index]),
+            return ShowingTooltipIndicators([
+              LineBarSpot(
+                tooltipsOnBar,
+                lineBarsData.indexOf(tooltipsOnBar),
+                tooltipsOnBar.spots[index],
+              ),
             ]);
           }).toList(),
           lineTouchData: LineTouchData(
@@ -121,7 +124,15 @@ class _ChartState extends State<Chart> {
                     show: false,
                     getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
                       radius: 8,
-                      color: lerpGradient(barData.colors, barData.colorStops, percent / 100),
+                      color: lerpGradient([
+                        const Color(0xff12c2e9),
+                        const Color(0xffc471ed),
+                        const Color(0xfff64f59),
+                      ], [
+                        0.1,
+                        0.4,
+                        0.9
+                      ], percent / 100),
                       strokeWidth: 2,
                       strokeColor: Colors.black,
                     ),
@@ -146,36 +157,55 @@ class _ChartState extends State<Chart> {
           lineBarsData: lineBarsData,
           minY: 0,
           titlesData: FlTitlesData(
-            leftTitles: SideTitles(
-              showTitles: false,
-            ),
-            bottomTitles: SideTitles(
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
                 showTitles: true,
-                getTitles: (val) {
-                  switch (val.toInt()) {
+                reservedSize: 30,
+                interval: 1,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  const style = TextStyle(
+                    color: Color(0xFFB6BDC4),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                  );
+                  String returnText = '';
+                  switch (value.toInt()) {
                     case 0:
-                      return dateDisplay[0].substring(5, dateDisplay[0].length);
+                      returnText = dateDisplay[0].substring(5, dateDisplay[0].length);
+                      break;
                     case 1:
-                      return dateDisplay[1].substring(5, dateDisplay[1].length);
+                      returnText = dateDisplay[1].substring(5, dateDisplay[1].length);
+                      break;
                     case 2:
-                      return dateDisplay[2].substring(5, dateDisplay[2].length);
+                      returnText = dateDisplay[2].substring(5, dateDisplay[2].length);
+                      break;
                     case 3:
-                      return dateDisplay[3].substring(5, dateDisplay[3].length);
+                      returnText = dateDisplay[3].substring(5, dateDisplay[3].length);
+                      break;
                     case 4:
-                      return dateDisplay[4].substring(5, dateDisplay[4].length);
+                      returnText = dateDisplay[4].substring(5, dateDisplay[4].length);
+                      break;
                     case 5:
-                      return dateDisplay[5].substring(5, dateDisplay[5].length);
+                      returnText = dateDisplay[5].substring(5, dateDisplay[5].length);
+                      break;
                     case 6:
-                      return dateDisplay[6].substring(5, dateDisplay[6].length);
+                      returnText = dateDisplay[6].substring(5, dateDisplay[6].length);
+                      break;
                   }
-                  return '';
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    space: 8.0,
+                    child: Text(
+                      returnText,
+                      style: style,
+                    ),
+                  );
                 },
-                getTextStyles: (value) => TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white38,
-                      fontFamily: 'Digital',
-                      fontSize: 12.0 + userTextSize,
-                    )),
+              ),
+            ),
           ),
           gridData: FlGridData(show: false),
           borderData: FlBorderData(

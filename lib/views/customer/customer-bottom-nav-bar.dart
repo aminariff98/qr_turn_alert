@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_turn_alert/scan.dart';
 import 'package:qr_turn_alert/settings.dart';
