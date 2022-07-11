@@ -16,7 +16,7 @@ class DealerAccountDetail extends StatefulWidget {
 class _DealerAccountDetailState extends State<DealerAccountDetail> {
   late final DocumentReference<UserModel> userModel;
   late TextEditingController _nameController, _msisdnController;
-  late String _name, _msisdn, _accountType, _email;
+  late String _name, _msisdn, _accountType, _email, _mykad;
 
   @override
   void initState() {
@@ -58,6 +58,7 @@ class _DealerAccountDetailState extends State<DealerAccountDetail> {
                 _msisdn = data.get('msisdn');
                 _accountType = data.get('accountType');
                 _email = data.get('email');
+                _mykad = data.get('mykad');
                 _nameController = TextEditingController(text: _name);
                 _msisdnController = TextEditingController(text: _msisdn);
 
@@ -218,6 +219,58 @@ class _DealerAccountDetailState extends State<DealerAccountDetail> {
                               Container(
                                 padding: EdgeInsets.all(10.0),
                                 child: Text(
+                                  'Identity Number',
+                                  style: Theme.of(context).textTheme.bodyText1!.apply(
+                                        fontSizeDelta: userTextSize,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Stack(
+                            alignment: Alignment.centerLeft,
+                            children: [
+                              Container(
+                                decoration: new BoxDecoration(border: Border.all(width: 0.0, color: Colors.transparent), color: Color(0xFFEAF2FA), borderRadius: new BorderRadius.circular(12.0)),
+                                child: TextFormField(
+                                  readOnly: true,
+                                  style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
+                                  cursorColor: Color(0xFF9b9b9b),
+                                  decoration: InputDecoration(
+                                    fillColor: Color(0xFFF5F6F7),
+                                    filled: true,
+                                    contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 15.0, 15.0),
+                                    border: InputBorder.none,
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.transparent, width: 0.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.transparent, width: 0.0),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    hintText: '',
+                                    hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
+                                  ),
+                                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                                  maxLines: 1,
+                                  onTap: () {},
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 15.0),
+                                child: Text(
+                                  '$_mykad',
+                                  style: Theme.of(context).textTheme.subtitle2!.apply(color: Color(0xff1C3664), fontSizeDelta: userTextSize),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(10.0),
+                                child: Text(
                                   'Email',
                                   style: Theme.of(context).textTheme.bodyText1!.apply(
                                         fontSizeDelta: userTextSize,
@@ -265,6 +318,9 @@ class _DealerAccountDetailState extends State<DealerAccountDetail> {
                               ),
                             ],
                           ),
+                          SizedBox(
+                            height: userScreenPadding,
+                          )
                         ],
                       ),
                     ),

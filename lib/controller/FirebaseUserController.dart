@@ -5,7 +5,7 @@ import 'package:qr_turn_alert/models/UserModel.dart';
 CollectionReference users = FirebaseFirestore.instance.collection('users');
 
 class FirebaseUserController {
-  Future<void> addUser(uid, fullName, accountType, contactNumber, email) {
+  Future<void> addUser(uid, fullName, accountType, contactNumber, email, mykad, password) {
     return users
         .doc(uid)
         .set({
@@ -13,7 +13,9 @@ class FirebaseUserController {
           'fullName': fullName,
           'accountType': accountType,
           'msisdn': contactNumber,
+          'mykad': mykad,
           'email': email,
+          'password': password,
         })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
