@@ -499,6 +499,9 @@ class _SignUpState extends State<SignUp> {
       late String accountType;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('email', email);
+      await prefs.setString('password', password);
+      biometricAuth = false;
+      await prefs.setBool('biometricAuth', false);
       if (dealerAccount) {
         accountType = 'dealer';
         FirebaseUserController().addUser(userCredential.user!.uid, _fullName, accountType, '0' + msisdn, email, mykad, password);

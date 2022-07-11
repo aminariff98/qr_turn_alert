@@ -3,12 +3,16 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:qr_turn_alert/controller/FirebaseUserController.dart';
 import 'package:qr_turn_alert/main.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:qr_turn_alert/models/UserModel.dart';
+import 'package:qr_turn_alert/views/auth/login.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-account-detail.dart';
 import 'package:qr_turn_alert/views/widgets/about-app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -18,12 +22,76 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   late String _name, _accountType;
   late final DocumentReference<UserModel> userModel;
+  final LocalAuthentication auth = LocalAuthentication();
 
   @override
   void initState() {
     super.initState();
     EasyLoading.dismiss();
+    getBiometricAuth();
     userModel = FirebaseUserController().getUser(uid);
+  }
+
+  checkDeviceBiometric() async {
+    final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+    final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+
+    if (canAuthenticate) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('biometricAuth', true);
+      _authenticateWithBiometrics();
+      setState(() {
+        biometricAuth = true;
+      });
+    } else {
+      biometricAuth = false;
+    }
+
+    await auth.authenticate(localizedReason: 'Please authenticate to login', options: const AuthenticationOptions(biometricOnly: true));
+  }
+
+  Future<void> _authenticateWithBiometrics() async {
+    String _authorized = 'Not Authorized';
+    bool _isAuthenticating = false;
+    bool authenticated = false;
+    try {
+      setState(() {
+        _isAuthenticating = true;
+        _authorized = 'Authenticating';
+      });
+      authenticated = await auth.authenticate(
+        localizedReason: 'Scan your fingerprint or face to authenticate',
+        options: const AuthenticationOptions(
+          useErrorDialogs: true,
+          stickyAuth: true,
+          biometricOnly: true,
+        ),
+      );
+      setState(() {
+        _isAuthenticating = false;
+        _authorized = 'Authenticating';
+      });
+    } on PlatformException catch (e) {
+      print(e);
+      setState(() {
+        _isAuthenticating = false;
+        _authorized = 'Error - ${e.message}';
+      });
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+
+    final String message = authenticated ? 'Authorized' : 'Not Authorized';
+    setState(() {
+      _authorized = message;
+    });
+  }
+
+  getBiometricAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    biometricAuth = prefs.getBool('biometricAuth') ?? false;
   }
 
   Widget build(BuildContext context) {
@@ -104,46 +172,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Column(
                         children: <Widget>[
                           SizedBox(
-                            height: 20,
-                          ),
-                          if (_accountType == 'customer') ...[
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.volume_up_outlined,
-                                  color: Colors.black,
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Text(
-                                  "Notifications",
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                            Divider(
-                              height: 15,
-                              thickness: 2,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            ListTile(
-                              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
-                              title: Text('Notification'),
-                              trailing: CupertinoSwitch(
-                                value: notification,
-                                onChanged: (bool value) {
-                                  setState(() {
-                                    notification = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                          SizedBox(
-                            height: 40,
+                            height: userScreenPadding * 2,
                           ),
                           Row(
                             children: [
@@ -163,6 +192,37 @@ class _SettingsPageState extends State<SettingsPage> {
                           Divider(
                             height: 15,
                             thickness: 2,
+                          ),
+                          if (_accountType == 'customer')
+                            ListTile(
+                              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                              title: Text('Allow Notification'),
+                              trailing: CupertinoSwitch(
+                                value: notification,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    notification = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
+                            title: Text('Use Touch ID / Face ID'),
+                            trailing: CupertinoSwitch(
+                              value: biometricAuth,
+                              onChanged: (bool value) async {
+                                if (value) {
+                                  checkDeviceBiometric();
+                                } else {
+                                  final prefs = await SharedPreferences.getInstance();
+                                  await prefs.setBool('biometricAuth', value);
+                                  setState(() {
+                                    biometricAuth = value;
+                                  });
+                                }
+                              },
+                            ),
                           ),
                           ListTile(
                             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: userScreenPadding),
@@ -339,7 +399,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   Expanded(
                     child: ListTile(
                       minVerticalPadding: 14,
-                      onTap: () {
+                      onTap: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.remove('email');
+                        await prefs.remove('password');
+                        await prefs.setBool('biometricAuth', false);
                         EasyLoading.show();
                         MyApp().signOut(context);
                       },

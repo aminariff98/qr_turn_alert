@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:qr_turn_alert/config/config.dart';
 import 'package:qr_turn_alert/controller/FirebaseUserController.dart';
 import 'package:qr_turn_alert/main.dart';
@@ -10,6 +12,9 @@ import 'package:qr_turn_alert/models/UserModel.dart';
 import 'package:qr_turn_alert/views/auth/sign-up.dart';
 import 'package:qr_turn_alert/views/customer/customer-bottom-nav-bar.dart';
 import 'package:qr_turn_alert/views/dealer/dealer-bottom-nav-bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+bool biometricAuth = false;
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -20,35 +25,68 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool value = false;
-  String email = '', password = '';
   String emailError = '', passwordError = '';
+  TextEditingController email = TextEditingController(text: '');
+  TextEditingController password = TextEditingController(text: '');
   bool _obscurePassword = true;
-  late DocumentReference<UserModel> userModel;
+  late final DocumentReference<UserModel> userModel;
+  final LocalAuthentication auth = LocalAuthentication();
 
   @override
   void initState() {
     super.initState();
     EasyLoading.dismiss();
-    FirebaseAuth.instance.idTokenChanges().listen((User? user) {
-      if (user == null) {
-        print('User is currently signed out!');
-      } else {
-        print('User is signed in!');
+    getBiometricAuth();
+  }
 
-        userModel = FirebaseUserController().getUser(user.uid);
-        uid = user.uid;
-        userModel.get().then((value) {
-          accountType = value.get('accountType');
-          fullName = value.get('fullName');
+  Future<void> _authenticateWithBiometrics() async {
+    String _authorized = 'Not Authorized';
+    bool _isAuthenticating = false;
+    bool authenticated = false;
+    try {
+      setState(() {
+        _isAuthenticating = true;
+        _authorized = 'Authenticating';
+      });
+      authenticated = await auth.authenticate(
+        localizedReason: 'Scan your fingerprint or face to authenticate',
+        options: const AuthenticationOptions(
+          useErrorDialogs: true,
+          stickyAuth: true,
+          biometricOnly: true,
+        ),
+      );
+      setState(() {
+        _isAuthenticating = false;
+        _authorized = 'Authenticating';
+      });
+    } on PlatformException catch (e) {
+      print(e);
+      setState(() {
+        _isAuthenticating = false;
+        _authorized = 'Error - ${e.message}';
+      });
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
 
-          if (accountType == 'dealer') {
-            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
-          } else if (accountType == 'customer') {
-            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CustomerBottomNavBar()), (Route<dynamic> route) => false);
-          }
-        });
-      }
+    final String message = authenticated ? 'Authorized' : 'Not Authorized';
+    setState(() {
+      _authorized = message;
     });
+  }
+
+  getBiometricAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    biometricAuth = prefs.getBool('biometricAuth') ?? false;
+    if (biometricAuth) {
+      email.text = prefs.getString('email') ?? '';
+      setState(() {});
+    } else {
+      setState(() {});
+    }
   }
 
   @override
@@ -128,15 +166,10 @@ class _LoginState extends State<Login> {
                                   hintText: 'Email',
                                   hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
                                 ),
+                                controller: email,
                                 autovalidateMode: AutovalidateMode.onUserInteraction,
                                 maxLines: 1,
                                 onChanged: (value) {
-                                  if (value.isEmpty) {
-                                    email = '';
-                                  } else {
-                                    email = value;
-                                  }
-
                                   emailError = '';
                                 },
                               ),
@@ -181,15 +214,14 @@ class _LoginState extends State<Login> {
                                   hintText: 'Password',
                                   hintStyle: Theme.of(context).textTheme.bodyText2!.apply(color: Color(0xFF9D9E9E), fontSizeDelta: userTextSize),
                                 ),
+                                controller: password,
                                 autovalidateMode: AutovalidateMode.onUserInteraction,
                                 maxLines: 1,
                                 onChanged: (value) {
-                                  if (value.isEmpty) {
-                                    password = '';
-                                  } else {
-                                    password = value;
-                                  }
-                                  passwordError = '';
+                                  setState(() {
+                                    emailError = '';
+                                    passwordError = '';
+                                  });
                                 },
                               ),
                             ),
@@ -238,8 +270,8 @@ class _LoginState extends State<Login> {
                                   padding: EdgeInsets.symmetric(vertical: userScreenPadding / 1.5, horizontal: userScreenPadding * 2),
                                 ),
                                 onPressed: () {
-                                  if (email != '') {
-                                    if (password != '') {
+                                  if (email.text != '') {
+                                    if (password.text != '') {
                                       EasyLoading.show();
                                       _signIn();
                                     } else {
@@ -255,26 +287,42 @@ class _LoginState extends State<Login> {
                                 },
                               ),
                             ),
-                            SizedBox(height: userScreenPadding * 2),
-                            GestureDetector(
-                              child: Container(
-                                padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
-                                child: Text(
-                                  'Don\'t have an account? Sign up',
-                                  style: Theme.of(context).textTheme.bodyText1!.apply(
-                                        color: Color(0xff1877F2),
-                                        fontSizeDelta: userTextSize,
-                                      ),
+                            if (biometricAuth)
+                              GestureDetector(
+                                child: Container(
+                                  padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
+                                  child: Text(
+                                    'Login with Touch ID / Face ID',
+                                    style: Theme.of(context).textTheme.bodyText2!.apply(
+                                          color: Color(0xff1877F2),
+                                          fontSizeDelta: userTextSize,
+                                        ),
+                                  ),
                                 ),
+                                onTap: () {
+                                  loginUsingBiometric();
+                                },
                               ),
-                              onTap: () {
-                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => SignUp()), (Route<dynamic> route) => false);
-                              },
-                            ),
                           ],
                         ),
                       ),
                     ),
+                  ),
+                  SizedBox(height: userScreenPadding),
+                  GestureDetector(
+                    child: Container(
+                      padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
+                      child: Text(
+                        'Don\'t have an account? Sign up',
+                        style: Theme.of(context).textTheme.bodyText1!.apply(
+                              color: Color(0xff1877F2),
+                              fontSizeDelta: userTextSize,
+                            ),
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => SignUp()), (Route<dynamic> route) => false);
+                    },
                   ),
                 ],
               ),
@@ -285,12 +333,38 @@ class _LoginState extends State<Login> {
     );
   }
 
+  loginUsingBiometric() {
+    _authenticateWithBiometrics().whenComplete(() => FirebaseAuth.instance.idTokenChanges().listen((User? user) {
+          if (user == null) {
+            print('User is currently signed out!');
+          } else {
+            print('User is signed in!');
+
+            userModel = FirebaseUserController().getUser(user.uid);
+            uid = user.uid;
+            userModel.get().then((value) {
+              accountType = value.get('accountType');
+              fullName = value.get('fullName');
+
+              if (accountType == 'dealer') {
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => DealerBottomNavBar()), (Route<dynamic> route) => false);
+              } else if (accountType == 'customer') {
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CustomerBottomNavBar()), (Route<dynamic> route) => false);
+              }
+            });
+          }
+        }));
+  }
+
   _signIn() async {
-    print(email + password);
+    print(email.text + ' : ' + password.text);
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email.text, password: password.text);
       EasyLoading.dismiss();
       uid = userCredential.user!.uid;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('email', email.text);
+      await prefs.setString('password', password.text);
 
       userModel = FirebaseUserController().getUser(uid);
       userModel.get().then((value) {
@@ -307,6 +381,10 @@ class _LoginState extends State<Login> {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
       } else if (e.code == 'wrong-password') {
+        EasyLoading.dismiss();
+        setState(() {
+          emailError = 'Invalid email or password.';
+        });
         print('Wrong password provided for that user.');
       }
     }
