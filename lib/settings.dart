@@ -39,7 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (canAuthenticate) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('biometricAuth', true);
-      _authenticateWithBiometrics();
+      _authenticate();
       setState(() {
         biometricAuth = true;
       });
@@ -50,7 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
     await auth.authenticate(localizedReason: 'Please authenticate to login', options: const AuthenticationOptions(biometricOnly: true));
   }
 
-  Future<void> _authenticateWithBiometrics() async {
+  Future<void> _authenticate() async {
     String _authorized = 'Not Authorized';
     bool _isAuthenticating = false;
     bool authenticated = false;
@@ -60,16 +60,14 @@ class _SettingsPageState extends State<SettingsPage> {
         _authorized = 'Authenticating';
       });
       authenticated = await auth.authenticate(
-        localizedReason: 'Scan your fingerprint or face to authenticate',
+        localizedReason: 'Let OS determine authentication method',
         options: const AuthenticationOptions(
           useErrorDialogs: true,
           stickyAuth: true,
-          biometricOnly: true,
         ),
       );
       setState(() {
         _isAuthenticating = false;
-        _authorized = 'Authenticating';
       });
     } on PlatformException catch (e) {
       print(e);
@@ -83,11 +81,47 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
 
-    final String message = authenticated ? 'Authorized' : 'Not Authorized';
-    setState(() {
-      _authorized = message;
-    });
+    setState(() => _authorized = authenticated ? 'Authorized' : 'Not Authorized');
   }
+
+  // Future<void> _authenticateWithBiometrics() async {
+  //   String _authorized = 'Not Authorized';
+  //   bool _isAuthenticating = false;
+  //   bool authenticated = false;
+  //   try {
+  //     setState(() {
+  //       _isAuthenticating = true;
+  //       _authorized = 'Authenticating';
+  //     });
+  //     authenticated = await auth.authenticate(
+  //       localizedReason: 'Scan your fingerprint or face to authenticate',
+  //       options: const AuthenticationOptions(
+  //         useErrorDialogs: true,
+  //         stickyAuth: true,
+  //         biometricOnly: true,
+  //       ),
+  //     );
+  //     setState(() {
+  //       _isAuthenticating = false;
+  //       _authorized = 'Authenticating';
+  //     });
+  //   } on PlatformException catch (e) {
+  //     print(e);
+  //     setState(() {
+  //       _isAuthenticating = false;
+  //       _authorized = 'Error - ${e.message}';
+  //     });
+  //     return;
+  //   }
+  //   if (!mounted) {
+  //     return;
+  //   }
+
+  //   final String message = authenticated ? 'Authorized' : 'Not Authorized';
+  //   setState(() {
+  //     _authorized = message;
+  //   });
+  // }
 
   getBiometricAuth() async {
     final prefs = await SharedPreferences.getInstance();
